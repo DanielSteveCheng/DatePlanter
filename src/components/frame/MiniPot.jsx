@@ -1,13 +1,21 @@
-import { useRef } from 'react';
+import { useRef, useState } from 'react';
 import { useBridge } from '../../api/BridgeContext';
 import { Sprite } from '../../sprites/Sprite';
 import { cn } from '../../lib/cn';
+import { pickLoadingMessage } from '../../lib/loadingMessages';
 
 const DRAG_THRESHOLD_PX = 4;
 
-export function MiniPot({ position, leaving, onOpen }) {
+const STATE_CLASSES = {
+  waiting: 'pointer-events-none animate-bob',
+  resting: 'animate-pop',
+  leaving: 'pointer-events-none animate-fade-out',
+};
+
+export function MiniPot({ position, state, onOpen }) {
   const { window: win } = useBridge();
   const gesture = useRef(null);
+  const [loadingMessage] = useState(() => pickLoadingMessage());
 
   function onPointerDown(event) {
     event.currentTarget.setPointerCapture(event.pointerId);
@@ -32,8 +40,8 @@ export function MiniPot({ position, leaving, onOpen }) {
   return (
     <button
       type="button"
-      aria-label="Open Date Planter"
-      title="Open Date Planter"
+      aria-label={state === 'waiting' ? 'Loading Date Planter' : 'Open Date Planter'}
+      title={state === 'waiting' ? 'Loading…' : 'Open Date Planter'}
       onPointerEnter={() => win.setPotHover(true)}
       onPointerLeave={() => !gesture.current && win.setPotHover(false)}
       onPointerDown={onPointerDown}
@@ -43,10 +51,21 @@ export function MiniPot({ position, leaving, onOpen }) {
       onKeyDown={(event) => event.key === 'Enter' && onOpen()}
       className={cn(
         'absolute h-24 w-20 -translate-x-1/2 -translate-y-full outline-none',
-        leaving ? 'pointer-events-none animate-fade-out' : 'animate-pop',
+        STATE_CLASSES[state],
       )}
       style={{ left: position.x, top: position.y }}
     >
+      {state === 'waiting' && (
+        <span className="absolute bottom-full left-1/2 mb-2 flex -translate-x-1/2 flex-col items-center gap-1.5">
+          <span
+            data-slot="loading-message"
+            className="whitespace-nowrap rounded-full bg-bubble-fill px-2.5 py-0.5 text-bubble font-bold text-bubble-ink shadow-md"
+          >
+            {loadingMessage}
+          </span>
+          <Sprite slot="loading-spinner" className="size-7 animate-spin" />
+        </span>
+      )}
       <Sprite slot="mini-pot" className="size-full transition hover:scale-105 hover:brightness-105" />
     </button>
   );

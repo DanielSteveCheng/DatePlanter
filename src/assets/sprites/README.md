@@ -19,6 +19,7 @@ Restart `npm run dev` after adding a new file.
 | `leaf-selected` | The leaf whose date is currently open           |
 | `bud`           | Bud on the half-grown vine before any dates     |
 | `mini-pot`      | The pot the window collapses into on minimize   |
+| `loading-spinner` | Spinner above the pot while the app starts (rotated automatically) |
 | `icon-settings`, `icon-minimize`, `icon-close` | Title bar buttons (square; drawn in `--color-titlebar-text` by default) |
 | `map-pin`       | Pin for a place on the date map (28×36, tip at bottom centre) |
 | `resize-grip`   | Bottom-right corner handle for resizing          |

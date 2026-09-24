@@ -7,7 +7,7 @@ export const originAt = ({ x, y }) => `${x}px ${y}px`;
 
 export function useMiniMode() {
   const { window: win } = useBridge();
-  const [phase, setPhase] = useState('full');
+  const [phase, setPhase] = useState('loading');
   const [pot, setPot] = useState(homePosition);
 
   useEffect(() => win.onPotMoved(setPot), [win]);
@@ -22,6 +22,8 @@ export function useMiniMode() {
     setPhase('expanding');
   }, [win]);
 
+  const reveal = useCallback(() => setPhase((current) => (current === 'loading' ? 'expanding' : current)), []);
+
   const finishAnimation = useCallback(() => {
     if (phase === 'expanding') setPhase('full');
     if (phase === 'collapsing') {
@@ -30,5 +32,5 @@ export function useMiniMode() {
     }
   }, [phase, win]);
 
-  return { phase, pot, collapse, expand, finishAnimation };
+  return { phase, pot, collapse, expand, reveal, finishAnimation };
 }

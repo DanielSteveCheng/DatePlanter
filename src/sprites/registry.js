@@ -12,6 +12,7 @@ export const IMAGE_SLOTS = {
   'leaf-selected': Defaults.LeafSelected,
   bud: Defaults.Bud,
   'mini-pot': Defaults.MiniPot,
+  'loading-spinner': Defaults.LoadingSpinner,
   'icon-settings': Defaults.IconSettings,
   'icon-minimize': Defaults.IconMinimize,
   'icon-close': Defaults.IconClose,

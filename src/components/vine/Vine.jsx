@@ -35,11 +35,13 @@ export function Vine({ dates, selectedId, onSelectDate, onPlant }) {
       style={{ right: VINE_LAYOUT.right, width: VINE_LAYOUT.width }}
     >
       <div className="absolute inset-0 will-change-transform" style={{ transform: `translate3d(0, ${-scroll}px, 0)` }}>
-        <Stem
-          fromKnot={isEmpty ? 0 : -1}
-          toKnot={lastStemKnot(ids.length, height)}
-          offsetY={stemOffsetY(ids.length, height)}
-        />
+        {height > 0 && (
+          <Stem
+            fromKnot={isEmpty ? 0 : -1}
+            toKnot={lastStemKnot(ids.length, height)}
+            offsetY={stemOffsetY(ids.length, height)}
+          />
+        )}
         {isEmpty && height > 0 && <Bud {...budPosition(height)} onClick={onPlant} />}
         {leaves.map(({ id, index, side, x, y }) => (
           <Leaf

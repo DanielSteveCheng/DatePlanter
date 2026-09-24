@@ -137,3 +137,12 @@ export const IconClose = (props) => (
     <path d="M4 4 L12 12 M12 4 L4 12" />
   </TitleIcon>
 );
+
+export function LoadingSpinner(props) {
+  return (
+    <svg viewBox="0 0 24 24" fill="none" strokeWidth="3" strokeLinecap="round" {...props}>
+      <circle cx="12" cy="12" r="9" stroke="var(--color-spinner-track)" />
+      <path d="M12 3 A9 9 0 0 1 21 12" stroke="var(--color-spinner)" />
+    </svg>
+  );
+}
