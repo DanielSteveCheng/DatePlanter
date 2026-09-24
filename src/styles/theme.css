@@ -1,0 +1,60 @@
+@theme {
+  --font-display: 'Quicksand', ui-rounded, system-ui, sans-serif;
+
+  --color-frame: #ffd98a;
+  --color-frame-edge: #f7c56b;
+  --color-titlebar-text: #c49a4a;
+
+  --color-sky-clear: #74d6ff;
+  --color-sky-overcast: #9eabb5;
+  --color-sky-text: #ffffff;
+
+  --color-sun: #fff05a;
+  --color-cloud: #f4f6f8;
+  --color-rain: #d9efff;
+  --color-snow: #ffffff;
+  --color-lightning: #fff6a8;
+
+  --color-stem: #3f6a12;
+  --color-leaf: #4a7418;
+  --color-leaf-vein: #3a5d10;
+  --color-leaf-sprout: #8dbb3e;
+  --color-leaf-selected: #6fa22a;
+
+  --color-soil: #9a582b;
+  --color-soil-panel: #d68a58;
+  --color-soil-text: #fff4e6;
+
+  --color-card: #8b3f1f;
+  --color-card-field: #e2926a;
+  --color-card-text: #fff4e6;
+  --color-card-accent: #ffd98a;
+
+  --animate-sway: sway 4s ease-in-out infinite;
+  --animate-fall: fall 0.9s linear infinite;
+  --animate-flash: flash 6s linear infinite;
+  --animate-sprout: sprout 0.5s ease-out both;
+  --animate-drift: drift 40s linear infinite;
+
+  @keyframes sway {
+    0%, 100% { rotate: -4deg; }
+    50% { rotate: 4deg; }
+  }
+  @keyframes fall {
+    from { translate: 0 -20px; opacity: 0; }
+    10% { opacity: 1; }
+    to { translate: -12px 260px; opacity: 0.8; }
+  }
+  @keyframes flash {
+    0%, 88%, 92%, 100% { opacity: 0; }
+    89%, 91% { opacity: 1; }
+  }
+  @keyframes sprout {
+    from { scale: 0; }
+    to { scale: 1; }
+  }
+  @keyframes drift {
+    0%, 100% { translate: 0 0; }
+    50% { translate: 24px 0; }
+  }
+}

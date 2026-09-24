@@ -1,0 +1,26 @@
+@import 'tailwindcss';
+@import './styles/theme.css';
+
+@layer base {
+  html,
+  body,
+  #root {
+    height: 100%;
+    margin: 0;
+    background: transparent;
+    overflow: hidden;
+    user-select: none;
+  }
+
+  body {
+    font-family: var(--font-display);
+  }
+}
+
+@utility app-drag {
+  -webkit-app-region: drag;
+}
+
+@utility app-no-drag {
+  -webkit-app-region: no-drag;
+}
