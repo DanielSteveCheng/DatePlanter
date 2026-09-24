@@ -6,6 +6,8 @@ const DEFAULT_SETTINGS = Object.freeze({
   units: 'fahrenheit',
   location: null,
   weatherPreview: 'live',
+  devMode: false,
+  keepOnTop: 'pot',
   storage: { type: 'file', filePath: '', supabaseUrl: '', supabaseKey: '' },
 });
 

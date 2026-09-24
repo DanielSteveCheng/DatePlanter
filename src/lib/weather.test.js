@@ -1,5 +1,5 @@
 import { describe, expect, it, vi } from 'vitest';
-import { buildForecastUrl, conditionFromCode, fetchForecast, parseGeocode, sceneFor, SCENES, CONDITIONS } from './weather';
+import { WIND, activeCondition, buildForecastUrl, windFor, windStyle, conditionFromCode, fetchForecast, parseGeocode, sceneFor, SCENES, CONDITIONS } from './weather';
 
 describe('conditionFromCode', () => {
   it.each([
@@ -67,5 +67,29 @@ describe('parseGeocode', () => {
       { name: 'Austin, Texas, US', latitude: 1, longitude: 2 },
     ]);
     expect(parseGeocode({})).toEqual([]);
+  });
+});
+
+describe('activeCondition', () => {
+  const forecast = { condition: 'rain' };
+
+  it('uses the live forecast unless developer mode overrides it', () => {
+    expect(activeCondition({ devMode: false, weatherPreview: 'snow' }, forecast)).toBe('rain');
+    expect(activeCondition({ devMode: true, weatherPreview: 'live' }, forecast)).toBe('rain');
+    expect(activeCondition({ devMode: true, weatherPreview: 'snow' }, forecast)).toBe('snow');
+  });
+});
+
+describe('wind', () => {
+  it('sways harder as the weather gets rougher', () => {
+    const [calm, rain, thunder] = ['sunny', 'rain', 'thunder'].map((c) => windFor(sceneFor(c)));
+    expect(rain.leafSway).toBeGreaterThan(calm.leafSway);
+    expect(thunder.leafSway).toBeGreaterThan(rain.leafSway);
+    expect(thunder.vineSway).toBeGreaterThan(rain.vineSway);
+  });
+
+  it('defines wind for every scene and exposes it as css variables', () => {
+    CONDITIONS.forEach((condition) => expect(WIND[SCENES[condition].wind]).toBeDefined());
+    expect(windStyle(WIND.calm)).toEqual({ '--leaf-sway': '4deg', '--vine-sway': '0.4deg', '--sway-period': '4s' });
   });
 });

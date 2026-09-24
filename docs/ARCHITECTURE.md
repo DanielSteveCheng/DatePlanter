@@ -3,6 +3,7 @@
 ```
 electron/                 main process (Node): window, settings, storage
   main.cjs                creates the frameless window
+  windowSizing.cjs        ratio-locked resizing and UI zoom
   preload.cjs             exposes the window.dateplanter API to the UI
   ipc.cjs                 routes API calls to the active store; swaps stores when settings change
   settings.cjs            settings.json in the OS app-data folder
@@ -13,7 +14,7 @@ electron/                 main process (Node): window, settings, storage
     index.cjs             picks a backend from settings
 src/                      renderer (React + Tailwind)
   api/                    bridge to the main process, plus an in-memory stand-in
-  lib/                    pure logic: dates, weather, vine layout, selection state
+  lib/                    pure logic: dates, weather, vine layout, selection, stats, scrolling
   hooks/                  React glue around lib/ and the bridge
   sprites/                slot registry, <Sprite>, <Surface>, default SVG art
   components/             UI, one folder per region (frame, sky, vine, dates, soil, settings)
@@ -38,6 +39,8 @@ The whole shared state is one **garden** document:
 }
 ```
 
+- `place` is `null` or `{ id, label, address, latitude, longitude }` when a search suggestion was
+  picked. `where` is always the display text, so typed-only locations still work.
 - `id` is a client-generated UUID, so a date can be created offline without asking a server.
 - `when` is an ISO local datetime string (from `<input type="datetime-local">`), so it sorts as text.
 - `dates` is stored **unordered**. The vine's order is derived (`sortNewestFirst`: by `when`, then
@@ -83,8 +86,7 @@ sprite. ⚙ → *Preview weather* forces a condition, which helps when designing
 
 ## Vine
 
-`src/lib/vine.js` lays leaves out as a pure function of `(ids, scroll)`: slot 0 is the blank sprout,
-then dates newest-first, alternating sides, each `spacing` px lower. Leaves are keyed by id and animate
+`src/lib/vine.js` lays leaves out as a pure function of `(ids, scroll)`: dates newest-first from the top, alternating sides, each `spacing` px lower. Leaves are keyed by id and animate
 their `top`. When a date is planted, every older leaf slides down one slot ("the vine grows"), and the
 new leaf plays a sprout animation (`useNewIds`).
 
@@ -95,6 +97,47 @@ new leaf plays a sprout animation (`useNewIds`).
 - `import.meta.glob` discovers the files at build time, so adding art needs no code.
 - Default SVGs are colored with theme variables, so recoloring only means editing `theme.css`.
 - Every themed element has a `data-slot` attribute for targeted CSS.
+
+## Window sizing
+
+Frameless transparent windows can't be resized natively on Windows, so the corner grip asks the main
+process to begin/end a resize. While it's active, main follows the cursor, fits the size to the base
+380×540 ratio (`fitToRatio`), keeps it on screen, and sets the page zoom to `width / 380`. The layout
+is only ever designed at one size and scales from there.
+
+## Pot mode (minimize)
+
+Minimize never resizes the window. `useMiniMode` shrinks the app into the bottom centre
+(`animate-shrink`), then `miniMode.collapse()` makes the window click-through
+(`setIgnoreMouseEvents(true, { forward: true })`) so only the `MiniPot` is interactive; hovering the
+pot turns clicks back on. Expanding is the reverse: the pot fades out in place while the app grows
+from it (`animate-grow`). Avoiding a resize matters on Windows, which briefly shows the old frame
+stretched from the top-left corner whenever a transparent window changes size.
+
+Dragging the pot moves the invisible window with it. `placePot` in `electron/miniMode.cjs` keeps the
+window on screen and slides the pot within it once the window hits an edge, so the app always opens
+fully visible and grows from wherever the pot is.
+
+## Places and map
+
+`src/lib/places.js` queries Photon (OpenStreetMap geocoding, free, no key) and turns results into
+places; `placeKey`/`placeLabel` give stats one identity per real place, falling back to typed text.
+`src/components/map/DateMap.jsx` renders OpenStreetMap tiles with Leaflet, one pin per place
+(`groupDatesByPlace`). OSM's tile policy asks apps to identify themselves, so `electron/identify.cjs`
+sets a Date Planter User-Agent on tile and search requests. `electron/externalLinks.cjs` opens any
+link (like the map attribution) in the browser instead of navigating the app window.
+
+## Stats
+
+`computeStats(dates, now)` in `src/lib/stats.js` derives everything the stats panel shows. Rankings
+share one helper, `rankBy(items, keyOf, labelOf)`, so adding a new breakdown is one line there and
+one `<StatRanking>` in `StatsPanel`.
+
+## Developer mode
+
+`settings.devMode` (toggled by Ctrl+Shift+D via `useDevMode`) shows `DevToolbar`. The weather preview
+only applies while dev mode is on (`activeCondition`). **Slots** adds a `show-slots` class that outlines
+every `[data-slot]` element.
 
 ## Testing
 

@@ -4,7 +4,7 @@ const { createStore, storageKey } = require('./storage/index.cjs');
 
 const SHARED_FILE_NAME = 'date-planter.json';
 
-function registerIpc({ win, settings, defaultDataPath }) {
+function registerIpc({ win, settings, resizer, miniMode, onTop, defaultDataPath }) {
   let store = null;
   let unsubscribe = () => {};
 
@@ -30,6 +30,7 @@ function registerIpc({ win, settings, defaultDataPath }) {
     const before = storageKey(settings.get().storage);
     const next = settings.update(patch);
     if (storageKey(next.storage) !== before) connect();
+    onTop.refresh();
     return next;
   }
 
@@ -41,9 +42,14 @@ function registerIpc({ win, settings, defaultDataPath }) {
     'settings:get': () => settings.get(),
     'settings:update': updateSettings,
     'settings:chooseFolder': chooseFolder,
-    'window:minimize': () => win.minimize(),
-    'window:toggleMaximize': () => (win.isMaximized() ? win.unmaximize() : win.maximize()),
+    'window:collapse': () => miniMode.collapse(),
+    'window:expand': () => miniMode.expand(),
+    'window:setPotHover': (hovering) => miniMode.setPotHover(Boolean(hovering)),
+    'window:beginDrag': () => miniMode.beginDrag(),
+    'window:endDrag': () => miniMode.endDrag(),
     'window:close': () => win.close(),
+    'window:beginResize': () => resizer.start(),
+    'window:endResize': () => resizer.stop(),
   };
 
   for (const [channel, handler] of Object.entries(handlers)) {

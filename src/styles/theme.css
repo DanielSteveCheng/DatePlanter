@@ -1,12 +1,34 @@
 @theme {
   --font-display: 'Quicksand', ui-rounded, system-ui, sans-serif;
 
+  --text-titlebar: 1rem;
+  --text-titlebar--line-height: 1.5rem;
+  --text-day: 1.75rem;
+  --text-day--line-height: 1.5;
+  --text-temp: 1.25rem;
+  --text-temp--line-height: 1.25;
+  --text-sky-hint: 0.75rem;
+  --text-sky-hint--line-height: 1.25;
+  --text-heading: 0.875rem;
+  --text-heading--line-height: 1.25rem;
+  --text-body: 0.75rem;
+  --text-body--line-height: 1rem;
+  --text-label: 10px;
+  --text-label--line-height: 1.4;
+  --text-add-date: 0.75rem;
+  --text-add-date--line-height: 1rem;
+  --text-stat-value: 1.125rem;
+  --text-stat-value--line-height: 1.5rem;
+  --text-bubble: 0.75rem;
+  --text-bubble--line-height: 1rem;
+
   --color-frame: #ffd98a;
   --color-frame-edge: #f7c56b;
   --color-titlebar-text: #c49a4a;
 
-  --color-sky-clear: #74d6ff;
+  --color-sky-clear: #46BCE6;
   --color-sky-overcast: #9eabb5;
+  --color-sky-snow: #97DBF4;
   --color-sky-text: #ffffff;
 
   --color-sun: #fff05a;
@@ -14,12 +36,21 @@
   --color-rain: #d9efff;
   --color-snow: #ffffff;
   --color-lightning: #fff6a8;
+  --color-lightning-flash: rgb(255 255 255 / 0.3);
 
   --color-stem: #3f6a12;
   --color-leaf: #4a7418;
   --color-leaf-vein: #3a5d10;
-  --color-leaf-sprout: #8dbb3e;
   --color-leaf-selected: #6fa22a;
+  --color-bud: #f28fb4;
+  --color-pot: #8a5429;
+  --color-pot-rim: #a5652f;
+  --color-pot-heart: #d9534f;
+  --color-pin: #d9534f;
+  --color-pin-edge: #8b3f1f;
+  --color-pin-ink: #fffaf0;
+  --color-bubble-fill: #fffaf0;
+  --color-bubble-ink: #8b3f1f;
 
   --color-soil: #9a582b;
   --color-soil-panel: #d68a58;
@@ -30,31 +61,68 @@
   --color-card-text: #fff4e6;
   --color-card-accent: #ffd98a;
 
-  --animate-sway: sway 4s ease-in-out infinite;
+  --color-scroll-track: rgb(0 0 0 / 0.2);
+  --color-scroll-thumb: #ffd98a;
+
+  --color-stat-bar: #ffd98a;
+  --color-stat-track: rgb(255 255 255 / 0.1);
+  --color-stat-tile: rgb(0 0 0 / 0.18);
+
+  --animate-sway: sway var(--sway-period, 4s) ease-in-out infinite;
+  --animate-vine-sway: vine-sway calc(var(--sway-period, 4s) * 2) ease-in-out infinite;
   --animate-fall: fall 0.9s linear infinite;
-  --animate-flash: flash 6s linear infinite;
+  --animate-strike: strike 0.6s ease-out forwards;
   --animate-sprout: sprout 0.5s ease-out both;
   --animate-drift: drift 40s linear infinite;
+  --animate-twirl: twirl 12s linear infinite;
+  --animate-shrink: shrink 320ms cubic-bezier(0.5, 0, 0.9, 0.4) both;
+  --animate-grow: grow 480ms cubic-bezier(0.2, 0.9, 0.3, 1.15) both;
+  --animate-pop: pop 260ms cubic-bezier(0.2, 0.9, 0.3, 1.3) both;
+  --animate-fade-out: fade-out 360ms ease-out both;
 
   @keyframes sway {
-    0%, 100% { rotate: -4deg; }
-    50% { rotate: 4deg; }
+    0%, 100% { rotate: calc(-1 * var(--leaf-sway, 4deg)); }
+    50% { rotate: var(--leaf-sway, 4deg); }
+  }
+  @keyframes vine-sway {
+    0%, 100% { rotate: calc(-1 * var(--vine-sway, 0.4deg)); }
+    50% { rotate: var(--vine-sway, 0.4deg); }
   }
   @keyframes fall {
-    from { translate: 0 -20px; opacity: 0; }
-    10% { opacity: 1; }
-    to { translate: -12px 260px; opacity: 0.8; }
+    from { translate: 0 var(--fall-spawn-y); }
+    to { translate: var(--fall-drift-x) 100cqh; }
   }
-  @keyframes flash {
-    0%, 88%, 92%, 100% { opacity: 0; }
-    89%, 91% { opacity: 1; }
+  @keyframes strike {
+    0% { opacity: 0; }
+    8% { opacity: 1; }
+    16% { opacity: 0.2; }
+    24% { opacity: 1; }
+    100% { opacity: 0; }
   }
   @keyframes sprout {
     from { scale: 0; }
     to { scale: 1; }
   }
+  @keyframes shrink {
+    from { scale: 1; opacity: 1; }
+    to { scale: 0.08; opacity: 0; }
+  }
+  @keyframes grow {
+    from { scale: 0.08; opacity: 0; }
+    to { scale: 1; opacity: 1; }
+  }
+  @keyframes fade-out {
+    to { scale: 0.85; opacity: 0; }
+  }
+  @keyframes pop {
+    from { scale: 0.6; opacity: 0; }
+    to { scale: 1; opacity: 1; }
+  }
+  @keyframes twirl {
+    to { rotate: 360deg; }
+  }
   @keyframes drift {
     0%, 100% { translate: 0 0; }
-    50% { translate: 24px 0; }
+    50% { translate: 16px 0; }
   }
 }

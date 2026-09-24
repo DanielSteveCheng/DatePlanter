@@ -42,7 +42,7 @@ export function LocationPicker({ location, onChange }) {
         <ul className="flex flex-col gap-0.5 normal-case">
           {results.map((place) => (
             <li key={`${place.latitude},${place.longitude}`}>
-              <button type="button" onClick={() => choose(place)} className="w-full rounded px-1 text-left text-xs hover:bg-white/10">
+              <button type="button" onClick={() => choose(place)} className="w-full rounded px-1 text-left text-body hover:bg-white/10">
                 {place.name}
               </button>
             </li>

@@ -29,7 +29,7 @@ export function StorageSettings({ storage, onChange }) {
           <Field label="Project URL">
             <TextInput value={storage.supabaseUrl} placeholder="https://xyz.supabase.co" onChange={(e) => onChange({ supabaseUrl: e.target.value })} />
           </Field>
-          <Field label="Anon key">
+          <Field label="Publishable (anon) key">
             <TextInput type="password" value={storage.supabaseKey} onChange={(e) => onChange({ supabaseKey: e.target.value })} />
           </Field>
         </>

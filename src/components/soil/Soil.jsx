@@ -10,7 +10,7 @@ export function Soil({ notes, onNotesChange, onAddDate }) {
         as="button"
         type="button"
         onClick={onAddDate}
-        className="w-20 rounded-xl bg-soil-panel text-xs font-semibold text-soil-text transition hover:brightness-105 active:scale-95"
+        className="w-20 rounded-xl bg-soil-panel text-add-date font-semibold text-soil-text transition hover:brightness-105 active:scale-95"
       >
         ADD
         <br />

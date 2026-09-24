@@ -1,7 +1,4 @@
-const upsertById = (list, item) =>
-  list.some((existing) => existing.id === item.id)
-    ? list.map((existing) => (existing.id === item.id ? item : existing))
-    : [...list, item];
+import { removeById, upsertById } from '../lib/list';
 
 export function createMemoryBridge(initialGarden = { dates: [], notes: '' }) {
   let garden = initialGarden;
@@ -10,6 +7,8 @@ export function createMemoryBridge(initialGarden = { dates: [], notes: '' }) {
     units: 'fahrenheit',
     location: null,
     weatherPreview: 'live',
+    devMode: false,
+    keepOnTop: 'pot',
     storage: { type: 'file', filePath: '', supabaseUrl: '', supabaseKey: '' },
   };
   const commit = (next) => Promise.resolve((garden = next));
@@ -19,7 +18,7 @@ export function createMemoryBridge(initialGarden = { dates: [], notes: '' }) {
     garden: {
       load: () => Promise.resolve(garden),
       upsertDate: (date) => commit({ ...garden, dates: upsertById(garden.dates, date) }),
-      deleteDate: (id) => commit({ ...garden, dates: garden.dates.filter((d) => d.id !== id) }),
+      deleteDate: (id) => commit({ ...garden, dates: removeById(garden.dates, id) }),
       saveNotes: (notes) => commit({ ...garden, notes }),
       onChange: () => () => {},
       onError: () => () => {},
@@ -32,6 +31,16 @@ export function createMemoryBridge(initialGarden = { dates: [], notes: '' }) {
       },
       chooseFolder: () => Promise.resolve(null),
     },
-    window: { minimize: noop, toggleMaximize: noop, close: noop },
+    window: {
+      collapse: noop,
+      expand: noop,
+      setPotHover: noop,
+      onPotMoved: () => () => {},
+      beginDrag: noop,
+      endDrag: noop,
+      close: noop,
+      beginResize: noop,
+      endResize: noop,
+    },
   };
 }

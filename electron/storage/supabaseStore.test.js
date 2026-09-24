@@ -29,7 +29,7 @@ function fakeSupabase() {
 describe('supabaseStore', () => {
   it('round-trips dates and notes through the REST api', async () => {
     const { fetchImpl } = fakeSupabase();
-    const store = createSupabaseStore({ url: 'https://x.supabase.co/', key: 'k' }, { fetchImpl });
+    const store = createSupabaseStore({ url: 'https://x.supabase.co/', key: 'a.b.c' }, { fetchImpl });
 
     await store.upsertDate({ id: 'a', title: 'Picnic' });
     const garden = await store.saveNotes('bring snacks');
@@ -38,7 +38,15 @@ describe('supabaseStore', () => {
 
     const [url, init] = fetchImpl.mock.calls[0];
     expect(url).toBe('https://x.supabase.co/rest/v1/dates');
-    expect(init.headers).toMatchObject({ apikey: 'k', Authorization: 'Bearer k' });
+    expect(init.headers).toMatchObject({ apikey: 'a.b.c', Authorization: 'Bearer a.b.c' });
+    store.dispose();
+  });
+
+  it('sends publishable keys only as the apikey header', async () => {
+    const { fetchImpl } = fakeSupabase();
+    const store = createSupabaseStore({ url: 'https://x.supabase.co', key: 'sb_publishable_abc' }, { fetchImpl });
+    await store.load();
+    expect(fetchImpl.mock.calls[0][1].headers).toEqual({ apikey: 'sb_publishable_abc', 'Content-Type': 'application/json' });
     store.dispose();
   });
 

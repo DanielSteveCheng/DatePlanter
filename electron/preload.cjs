@@ -1,6 +1,7 @@
 const { contextBridge, ipcRenderer } = require('electron');
 
 const invoke = (channel) => (...args) => ipcRenderer.invoke(channel, ...args);
+const command = (channel) => () => ipcRenderer.invoke(channel);
 
 function listen(channel, callback) {
   const handler = (_event, payload) => callback(payload);
@@ -23,8 +24,14 @@ contextBridge.exposeInMainWorld('dateplanter', {
     chooseFolder: invoke('settings:chooseFolder'),
   },
   window: {
-    minimize: invoke('window:minimize'),
-    toggleMaximize: invoke('window:toggleMaximize'),
-    close: invoke('window:close'),
+    collapse: command('window:collapse'),
+    expand: command('window:expand'),
+    beginDrag: command('window:beginDrag'),
+    endDrag: command('window:endDrag'),
+    setPotHover: (hovering) => ipcRenderer.invoke('window:setPotHover', Boolean(hovering)),
+    onPotMoved: (callback) => listen('window:potMoved', callback),
+    close: command('window:close'),
+    beginResize: command('window:beginResize'),
+    endResize: command('window:endResize'),
   },
 });

@@ -1,26 +1,30 @@
+import { useMemo } from 'react';
 import { Sprite } from '../../sprites/Sprite';
+import { PRECIPITATION, layoutParticles, randomLeftPercent } from '../../lib/precipitation';
 
-const PARTICLE_COUNT = 24;
-
-const particles = Array.from({ length: PARTICLE_COUNT }, (_, i) => ({
-  left: `${(i * 37) % 100}%`,
-  delay: `${((i * 0.29) % 1).toFixed(2)}s`,
-  duration: `${0.7 + ((i * 0.13) % 0.5)}s`,
-}));
+const respawnInNewColumn = (event) => {
+  event.currentTarget.style.left = `${randomLeftPercent()}%`;
+};
 
 export function Precipitation({ slot }) {
-  const slow = slot === 'snowflake';
+  const config = PRECIPITATION[slot];
+  const particles = useMemo(() => layoutParticles(config), [config]);
+
   return (
-    <div className="pointer-events-none absolute inset-0 top-12">
+    <div className="pointer-events-none absolute inset-0 @container-size">
       {particles.map((particle, i) => (
         <Sprite
           key={i}
           slot={slot}
-          className="absolute top-0 w-1.5 animate-fall"
+          className="absolute top-0 animate-fall"
+          onAnimationIteration={respawnInNewColumn}
           style={{
-            left: particle.left,
-            animationDelay: particle.delay,
-            animationDuration: slow ? `calc(${particle.duration} * 4)` : particle.duration,
+            left: `${particle.leftPercent}%`,
+            width: particle.size,
+            animationDuration: `${particle.duration}s`,
+            animationDelay: `${particle.delay}s`,
+            '--fall-spawn-y': `${config.spawnY}px`,
+            '--fall-drift-x': `${particle.driftX}px`,
           }}
         />
       ))}

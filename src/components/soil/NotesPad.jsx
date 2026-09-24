@@ -15,7 +15,7 @@ export function NotesPad({ notes, onChange }) {
 
   return (
     <Surface slot="soil-panel" as="label" className="flex flex-col rounded-xl bg-soil-panel p-2">
-      <span className="text-[10px] text-soil-text/90">Notes:</span>
+      <span className="text-label text-soil-text/90">Notes:</span>
       <textarea
         value={draft}
         placeholder="Date ideas, wishlists, reminders…"
@@ -25,7 +25,7 @@ export function NotesPad({ notes, onChange }) {
           setDraft(event.target.value);
           save(event.target.value);
         }}
-        className="min-h-0 flex-1 resize-none bg-transparent text-xs text-soil-text outline-none placeholder:text-soil-text/50"
+        className="min-h-0 flex-1 resize-none bg-transparent text-body text-soil-text outline-none placeholder:text-soil-text/50"
       />
     </Surface>
   );

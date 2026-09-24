@@ -1,3 +1,4 @@
+import { memo } from 'react';
 import { Sprite } from '../../sprites/Sprite';
 import { cn } from '../../lib/cn';
 
@@ -7,19 +8,21 @@ const SIDE_CLASSES = {
 };
 
 const SLOT_FOR_VARIANT = {
-  sprout: 'leaf-sprout',
   selected: 'leaf-selected',
   leaf: 'leaf',
 };
 
-export function Leaf({ label, side, y, index, variant, isNew, onClick }) {
+export const Leaf = memo(function Leaf({ id, label, side, x, y, index, variant, isNew, onSelect }) {
   return (
-    <div className="pointer-events-none absolute inset-x-0 transition-[top] duration-700 ease-out" style={{ top: y }}>
+    <div
+      className="pointer-events-none absolute inset-x-0 transition-[top,translate] duration-700 ease-out"
+      style={{ top: y, translate: `${x}px 0` }}
+    >
       <button
         type="button"
         aria-label={label}
         title={label}
-        onClick={onClick}
+        onClick={() => onSelect(id)}
         className={cn('pointer-events-auto absolute top-0 block w-16 animate-sway', SIDE_CLASSES[side])}
         style={{ animationDelay: `${-index * 0.7}s` }}
       >
@@ -32,4 +35,4 @@ export function Leaf({ label, side, y, index, variant, isNew, onClick }) {
       </button>
     </div>
   );
-}
+});

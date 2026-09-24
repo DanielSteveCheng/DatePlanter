@@ -2,14 +2,16 @@ const { normalizeGarden, createEmitter } = require('./garden.cjs');
 
 const NOTES_KEY = 'notes';
 
+const isLegacyJwtKey = (key) => key.split('.').length === 3;
+
+function authHeaders(key) {
+  return isLegacyJwtKey(key) ? { apikey: key, Authorization: `Bearer ${key}` } : { apikey: key };
+}
+
 function createSupabaseStore({ url, key }, { fetchImpl = fetch, pollMs = 10000 } = {}) {
   const baseUrl = `${url.replace(/\/+$/, '')}/rest/v1`;
   const emitter = createEmitter();
-  const headers = {
-    apikey: key,
-    Authorization: `Bearer ${key}`,
-    'Content-Type': 'application/json',
-  };
+  const headers = { ...authHeaders(key), 'Content-Type': 'application/json' };
 
   async function request(pathname, { method = 'GET', body, prefer } = {}) {
     const response = await fetchImpl(`${baseUrl}${pathname}`, {

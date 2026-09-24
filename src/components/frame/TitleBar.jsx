@@ -1,30 +1,20 @@
 import { useBridge } from '../../api/BridgeContext';
 import { Surface } from '../../sprites/Surface';
+import { IconButton } from '../ui/IconButton';
 
-function TitleButton({ label, onClick, children }) {
-  return (
-    <button
-      type="button"
-      aria-label={label}
-      title={label}
-      onClick={onClick}
-      className="app-no-drag grid size-5 place-items-center rounded font-bold text-titlebar-text hover:bg-black/5"
-    >
-      {children}
-    </button>
-  );
-}
+const TitleButton = (props) => (
+  <IconButton {...props} className="app-no-drag text-titlebar-text hover:bg-black/5" />
+);
 
-export function TitleBar({ onOpenSettings }) {
+export function TitleBar({ onOpenSettings, onMinimize }) {
   const { window: win } = useBridge();
   return (
     <Surface slot="titlebar" className="app-drag flex items-center justify-between px-4 pt-2 pb-1">
-      <span className="text-sm font-semibold text-titlebar-text">Date Planter</span>
-      <div className="flex items-center gap-1 text-sm">
-        <TitleButton label="Settings" onClick={onOpenSettings}>⚙</TitleButton>
-        <TitleButton label="Minimize" onClick={win.minimize}>_</TitleButton>
-        <TitleButton label="Maximize" onClick={win.toggleMaximize}>○</TitleButton>
-        <TitleButton label="Close" onClick={win.close}>✕</TitleButton>
+      <span className="text-titlebar font-semibold text-titlebar-text">Date Planter</span>
+      <div className="flex items-center gap-1 text-titlebar">
+        <TitleButton label="Settings" icon="icon-settings" onClick={onOpenSettings} />
+        <TitleButton label="Minimize" icon="icon-minimize" onClick={onMinimize} />
+        <TitleButton label="Close" icon="icon-close" onClick={win.close} />
       </div>
     </Surface>
   );

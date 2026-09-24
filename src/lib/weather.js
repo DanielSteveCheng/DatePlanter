@@ -1,13 +1,27 @@
 export const CONDITIONS = ['sunny', 'partly', 'cloudy', 'rain', 'thunder', 'snow'];
 
 export const SCENES = {
-  sunny: { sky: 'clear', bodies: ['sun'], precipitation: null, lightning: false },
-  partly: { sky: 'clear', bodies: ['sun', 'cloud'], precipitation: null, lightning: false },
-  cloudy: { sky: 'overcast', bodies: ['cloud'], precipitation: null, lightning: false },
-  rain: { sky: 'overcast', bodies: ['cloud'], precipitation: 'raindrop', lightning: false },
-  thunder: { sky: 'overcast', bodies: ['cloud'], precipitation: 'raindrop', lightning: true },
-  snow: { sky: 'overcast', bodies: ['cloud'], precipitation: 'snowflake', lightning: false },
+  sunny: { sky: 'clear', bodies: ['sun'], precipitation: null, lightning: false, wind: 'calm' },
+  partly: { sky: 'clear', bodies: ['sun', 'cloud'], precipitation: null, lightning: false, wind: 'calm' },
+  cloudy: { sky: 'overcast', bodies: ['cloud'], precipitation: null, lightning: false, wind: 'calm' },
+  rain: { sky: 'overcast', bodies: ['cloud'], precipitation: 'raindrop', lightning: false, wind: 'breezy' },
+  thunder: { sky: 'overcast', bodies: ['cloud-bolt', 'cloud'], precipitation: 'raindrop', lightning: true, wind: 'stormy' },
+  snow: { sky: 'snow', bodies: ['cloud-snowflake', 'cloud'], precipitation: 'snowflake', lightning: false, wind: 'calm' },
 };
+
+export const WIND = {
+  calm: { leafSway: 4, vineSway: 0.4, period: 4 },
+  breezy: { leafSway: 8, vineSway: 0.9, period: 3 },
+  stormy: { leafSway: 14, vineSway: 1.6, period: 2.2 },
+};
+
+export const windFor = (scene) => WIND[scene.wind] ?? WIND.calm;
+
+export const windStyle = ({ leafSway, vineSway, period }) => ({
+  '--leaf-sway': `${leafSway}deg`,
+  '--vine-sway': `${vineSway}deg`,
+  '--sway-period': `${period}s`,
+});
 
 const CODE_RANGES = [
   { max: 1, condition: 'sunny' },
@@ -71,3 +85,6 @@ export async function searchPlaces(query, fetchImpl = fetch) {
   if (!response.ok) throw new Error(`Location search failed (${response.status})`);
   return parseGeocode(await response.json());
 }
+
+export const activeCondition = ({ devMode, weatherPreview }, forecast) =>
+  devMode && weatherPreview && weatherPreview !== 'live' ? weatherPreview : forecast?.condition;

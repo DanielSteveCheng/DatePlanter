@@ -6,9 +6,16 @@ export const IMAGE_SLOTS = {
   raindrop: Defaults.Raindrop,
   snowflake: Defaults.Snowflake,
   lightning: Defaults.Lightning,
+  'cloud-bolt': Defaults.Lightning,
+  'cloud-snowflake': Defaults.SnowflakeIcon,
   leaf: Defaults.Leaf,
-  'leaf-sprout': Defaults.LeafSprout,
   'leaf-selected': Defaults.LeafSelected,
+  bud: Defaults.Bud,
+  'mini-pot': Defaults.MiniPot,
+  'icon-settings': Defaults.IconSettings,
+  'icon-minimize': Defaults.IconMinimize,
+  'icon-close': Defaults.IconClose,
+  'resize-grip': Defaults.ResizeGrip,
 };
 
 export const TEXTURE_SLOTS = [
@@ -16,11 +23,15 @@ export const TEXTURE_SLOTS = [
   'titlebar',
   'sky-clear',
   'sky-overcast',
-  'stem',
+  'sky-snow',
   'soil',
   'soil-panel',
   'date-card',
   'add-date-button',
+  'scroll-track',
+  'scroll-thumb',
+  'panel',
+  'bud-bubble',
 ];
 
 const customFiles = import.meta.glob('../assets/sprites/*.{png,jpg,jpeg,gif,webp,svg}', {
