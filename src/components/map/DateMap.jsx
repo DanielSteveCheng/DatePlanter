@@ -1,6 +1,7 @@
 import { useEffect, useRef } from 'react';
 import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
+import './map.css';
 import { MAP_TILES, MAP_VIEW, groupDatesByPlace } from '../../lib/map';
 import { formatWhen } from '../../lib/dates';
 import { customSpriteUrl } from '../../sprites/registry';

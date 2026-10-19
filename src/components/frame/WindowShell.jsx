@@ -12,7 +12,7 @@ const PHASE_CLASSES = {
 
 const POT_STATES = { loading: 'waiting', mini: 'resting', expanding: 'leaving' };
 
-export function WindowShell({ phase, pot, onAnimationEnd, onExpand, children }) {
+export function WindowShell({ phase, pot, inbox, onAnimationEnd, onExpand, children }) {
   const showPot = phase !== 'full' && phase !== 'collapsing';
 
   return (
@@ -24,7 +24,14 @@ export function WindowShell({ phase, pot, onAnimationEnd, onExpand, children }) 
       >
         {children}
       </div>
-      {showPot && <MiniPot position={pot} state={POT_STATES[phase]} onOpen={onExpand} />}
+      {showPot && (
+        <MiniPot
+          position={pot}
+          state={POT_STATES[phase]}
+          inbox={inbox}
+          onOpen={onExpand}
+        />
+      )}
     </div>
   );
 }

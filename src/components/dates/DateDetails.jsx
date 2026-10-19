@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { formatWhen, typeLabel } from '../../lib/dates';
 import { placeLabel } from '../../lib/places';
-import { Button } from '../ui/Field';
+import { Button } from '../ui/controls';
 
 function Detail({ label, value, hint }) {
   if (!value) return null;

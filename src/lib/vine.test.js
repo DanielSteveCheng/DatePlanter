@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { budPosition, clampScroll, hiddenBelow, lastStemKnot, layoutLeaves, maxScroll, stemOffsetY, wheelPixels } from './vine';
+import { budPosition, messageBudPosition, clampScroll, hiddenBelow, lastStemKnot, layoutLeaves, maxScroll, stemOffsetY, wheelPixels } from './vine';
 
 const layout = { topOffset: 10, spacing: 50, attachY: 20 };
 const straight = { bend: 0, minBend: 0 };
@@ -56,5 +56,17 @@ describe('empty vine', () => {
 
   it('sits at the top once leaves exist', () => {
     expect(stemOffsetY(4, 300, layout)).toBe(0);
+  });
+});
+
+describe('message bud', () => {
+  const straight = { bend: 0, minBend: 0 };
+
+  it('sits on the stem halfway between the first two leaves', () => {
+    expect(messageBudPosition(3, 300, { ...layout, width: 100 }, straight)).toEqual({ x: 50, y: 55 });
+  });
+
+  it('sits just below the planting bud on an empty vine', () => {
+    expect(messageBudPosition(0, 300, { ...layout, width: 100 }, straight)).toEqual({ x: 50, y: 175 });
   });
 });

@@ -1,15 +1,16 @@
 import { DATE_TYPES, toDateTimeInputValue } from './dates';
+import { createMessage } from './messages';
 
-export const DEV_ID_PREFIX = 'dev-';
-export const DEV_DATE_RANGE_DAYS = 60;
+const DEV_ID_PREFIX = 'dev-';
+const DEV_DATE_RANGE_DAYS = 60;
 const DEV_PLACES = ['The Park', 'Umi Sushi', 'Downtown', 'The Beach', 'Home', 'Art Museum', 'Farmers Market'];
 const DAY_MS = 24 * 60 * 60 * 1000;
 
-export const isDevDate = (date) => Boolean(date?.id?.startsWith(DEV_ID_PREFIX));
+export const isDevRecord = (date) => Boolean(date?.id?.startsWith(DEV_ID_PREFIX));
 
 const pick = (list, random) => list[Math.floor(random() * list.length)];
 
-export function devPlace(index, center) {
+function devPlace(index, center) {
   if (!center) return null;
   const angle = index * 2.4;
   const distance = 0.01 + index * 0.004;
@@ -49,3 +50,15 @@ export function createDevDates(count, { startNumber = 1, now = new Date(), rando
     };
   });
 }
+
+const DEV_NOTES = [
+  'Thinking about you 💛',
+  'Tacos this Friday?',
+  'I booked the pottery class!',
+  "Don't forget umbrellas tomorrow, it's supposed to pour.",
+];
+
+export const DEV_SENDER = Object.freeze({ deviceId: 'dev', name: 'Developer mode' });
+
+export const createDevMessage = (number, { now = new Date() } = {}) =>
+  createMessage(DEV_NOTES[(number - 1) % DEV_NOTES.length], { from: DEV_SENDER, now, id: `${DEV_ID_PREFIX}note-${number}` });

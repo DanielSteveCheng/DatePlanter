@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import { DATE_TYPES } from './dates';
-import { createDevDates, isDevDate } from './devDates';
+import { DEV_SENDER, createDevDates, createDevMessage, isDevRecord } from './devFixtures';
 
 const now = new Date('2026-09-24T12:00:00');
 
@@ -9,7 +9,7 @@ describe('createDevDates', () => {
     const dates = createDevDates(3, { startNumber: 4, now, random: () => 0.5 });
     expect(dates.map((d) => d.id)).toEqual(['dev-4', 'dev-5', 'dev-6']);
     expect(dates.map((d) => d.title)).toEqual(['Dev leaf 4', 'Dev leaf 5', 'Dev leaf 6']);
-    expect(dates.every(isDevDate)).toBe(true);
+    expect(dates.every(isDevRecord)).toBe(true);
   });
 
   it('pins places around a centre when one is given', () => {
@@ -27,7 +27,13 @@ describe('createDevDates', () => {
 });
 
 it('recognises only dev ids', () => {
-  expect(isDevDate({ id: 'dev-1' })).toBe(true);
-  expect(isDevDate({ id: '3f2a' })).toBe(false);
-  expect(isDevDate(undefined)).toBe(false);
+  expect(isDevRecord({ id: 'dev-1' })).toBe(true);
+  expect(isDevRecord({ id: '3f2a' })).toBe(false);
+  expect(isDevRecord(undefined)).toBe(false);
+});
+
+it('fakes incoming notes that are recognisable as dev data', () => {
+  const note = createDevMessage(2, { now: new Date('2026-09-25T09:00:00Z') });
+  expect(note).toMatchObject({ id: 'dev-note-2', from: DEV_SENDER, readAt: null });
+  expect(isDevRecord(note)).toBe(true);
 });

@@ -2,10 +2,21 @@
 
 A little desktop plant that grows a leaf for every date you plan together.
 
-- Click **ADD DATE!** to plant a new date. The newest date is the top leaf of the vine.
-- Click any leaf to see its details, edit, or delete it. Scroll over the vine to browse older leaves.
-- The **Notes** box in the soil is a shared scratchpad for ideas.
-- The sky follows today's weather (sunny, partly cloudy, cloudy, rain, thunder, snow).
+- **Plant a date:** click **ADD DATE!** (or the bud on an empty vine). The newest date is the top leaf.
+- **See a date:** click any leaf to view, edit or delete it. Scroll over the vine to browse older ones.
+- **Real places:** *Where* suggests real places ([Photon](https://photon.komoot.io), OpenStreetMap data,
+  no key needed). Pick one to pin the date on the map, or keep whatever you typed.
+- **Messages:** the ✉ button sends a message that blooms as a little bud on the other person's plant.
+  Clicking the bud opens it; **Reply** answers right there (showing what you're replying to), and
+  closing it marks it read. The ✉ panel lists what you've sent and whether it's been read.
+- **Notes:** the box in the soil is a shared scratchpad for ideas.
+- **Weather:** the sky follows today's weather (sunny, partly cloudy, cloudy, rain, thunder, snow).
+- **Stats and map:** ⚙ → **Stats** (favourite types, places, days…) and ⚙ → **Map** (every pinned date).
+- **Pot mode:** the _ button shrinks the app into a little pot you can drag anywhere; click it to grow
+  the app back. Messages appear on the pot too.
+- **Resizing:** drag the bottom-right grip. The window keeps its shape and everything scales with it.
+
+Open ⚙ to set your name, weather location, °F/°C, keep-on-top, and how you share the garden.
 
 ## Getting started
 
@@ -18,46 +29,54 @@ npm run dist     # build the Windows installer -> release/Date-Planter-Setup-<ve
 npm run icon     # re-render build/icon.png from the pot sprite and theme colours
 ```
 
+Changes to files in `electron/` need a restart of `npm run dev`; UI changes reload on their own.
+
 ## Installing
 
 Run `release/Date-Planter-Setup-<version>.exe` on each computer. It installs Date Planter for the
 current user and adds Start menu and desktop shortcuts. The installer isn't code-signed, so Windows
-SmartScreen may warn the first time: choose **More info → Run anyway**. The installed app uses the same
-data folder as `npm run dev` (`%APPDATA%\date-planter`), so your garden and settings carry over.
-To release a new version, bump `version` in `package.json` and run `npm run dist` again.
+SmartScreen may warn the first time: choose **More info → Run anyway**.
 
-Open ⚙ to set your name, a weather location, °F/°C and how you share the garden. ⚙ → **Stats** shows
-counts, favorite types, places, days and more. ⚙ → **Map** pins every date that has a real place.
-
-When planting a date, *Where* suggests real places (via [Photon](https://photon.komoot.io), OpenStreetMap
-data, no key needed), biased toward your weather location. Pick one to pin the date on the map, or keep
-whatever you typed.
-
-Drag the bottom-right grip to resize. The window keeps its shape and everything scales with it.
-
-**Developer mode** (Ctrl+Shift+D, or ⚙ → Developer) adds a toolbar to force any weather and to
-outline every sprite slot.
-
-To run a second, independent copy (e.g. to test sharing), point it at another data folder:
-`DATE_PLANTER_PROFILE=./profile-b npm start`.
+The installed app uses the same data folder as `npm run dev` (`%APPDATA%\date-planter`), so your
+garden and settings carry over. To release a new version, bump `version` in `package.json` and run
+`npm run dist` again.
 
 ## Sharing between two computers
 
-Pick one in ⚙ → Sharing, and set it up the same way on both computers.
+Pick one in ⚙ → Sharing, and set it up the same way on both computers. Dates, notes and messages are
+all shared.
 
 **Shared folder (easiest).** If you already share a Dropbox, Google Drive, OneDrive or iCloud folder,
 click **Pick** and choose it on both machines. The app keeps `date-planter.json` there and notices when
-the other person's changes sync in (within a couple of seconds of the sync client finishing).
+the other person's changes sync in.
 
 **Supabase (free hosted database).** Create a project at supabase.com, run
 [`docs/supabase.sql`](docs/supabase.sql) in its SQL editor, then paste the project URL and the
-publishable key (Project Settings → API Keys; the legacy `anon` key also works) into ⚙ on both computers. Changes show up on the other computer within ~10 seconds.
+publishable key (Project Settings → API Keys; the legacy `anon` key also works) into ⚙ on both
+computers. Changes show up on the other computer within about 10 seconds. The script is safe to run
+again, so re-run it after updates that add tables (messages need the `messages` table).
 
-## Custom art
+## Customizing the look
 
-Every visual piece is a named slot. Drop `leaf.png`, `sun.png`, `sky-clear.png`, etc. into
-`src/assets/sprites/` to replace it. Colors, font and animations live in `src/styles/theme.css`.
-See [`src/assets/sprites/README.md`](src/assets/sprites/README.md) for the full slot list.
+Every visual piece is a named sprite slot, and the rest of the look is in two files:
+
+| Change | Where |
+| --- | --- |
+| Art for any piece (sky, border, sun, leaves, pot, icons…) | Drop `<slot>.png` into [`src/assets/sprites/`](src/assets/sprites/) |
+| Sprite sizes, frame border and corners | [`src/sprites/sizes.js`](src/sprites/sizes.js) |
+| Colours, font, text sizes, animations | [`src/styles/theme.css`](src/styles/theme.css) |
+
+The full guide, with every slot name, what it's for, what size to draw it and where to tweak it, is
+in [`docs/CUSTOMIZING.md`](docs/CUSTOMIZING.md).
+
+## Developer tools
+
+- **Developer mode** (Ctrl+Shift+D, or ⚙ → Developer) adds a toolbar to force any weather, outline
+  every sprite slot, and add temporary leaves and messages. These are never saved or shared.
+- **Partner window** (to test sharing and messages on one computer): with `npm run dev` running, run
+  `npm run partner` in a second terminal. It opens another window with its own profile in
+  `.profiles/partner`, set up with your sharing settings, so it behaves like the other person's
+  computer. Delete that folder to start the partner fresh.
 
 ## How it's built
 

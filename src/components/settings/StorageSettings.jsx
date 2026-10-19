@@ -1,5 +1,5 @@
 import { useBridge } from '../../api/BridgeContext';
-import { Button, Field, Select, TextInput } from '../ui/Field';
+import { Button, Field, Select, TextInput } from '../ui/controls';
 
 export function StorageSettings({ storage, onChange }) {
   const bridge = useBridge();

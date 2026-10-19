@@ -1,5 +1,5 @@
 import { describe, expect, it, vi } from 'vitest';
-import { WIND, activeCondition, buildForecastUrl, windFor, windStyle, conditionFromCode, fetchForecast, parseGeocode, sceneFor, SCENES, CONDITIONS } from './weather';
+import { WIND, activeCondition, buildForecastUrl, windFor, windStyle, conditionFromCode, fetchForecast, sceneFor, SCENES, CONDITIONS } from './weather';
 
 describe('conditionFromCode', () => {
   it.each([
@@ -58,15 +58,6 @@ describe('forecast', () => {
   it('throws on a failed response', async () => {
     const fetchImpl = vi.fn().mockResolvedValue({ ok: false, status: 500 });
     await expect(fetchForecast({ latitude: 1, longitude: 2 }, 'fahrenheit', fetchImpl)).rejects.toThrow('500');
-  });
-});
-
-describe('parseGeocode', () => {
-  it('joins place names and handles empty results', () => {
-    expect(parseGeocode({ results: [{ name: 'Austin', admin1: 'Texas', country_code: 'US', latitude: 1, longitude: 2 }] })).toEqual([
-      { name: 'Austin, Texas, US', latitude: 1, longitude: 2 },
-    ]);
-    expect(parseGeocode({})).toEqual([]);
   });
 });
 

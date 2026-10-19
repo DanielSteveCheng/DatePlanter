@@ -1,6 +1,6 @@
 import { useMemo } from 'react';
 import { computeStats } from '../../lib/stats';
-import { Button } from '../ui/Field';
+import { Button } from '../ui/controls';
 import { Panel } from '../ui/Panel';
 import { StatRanking } from './StatRanking';
 import { StatTile } from './StatTile';

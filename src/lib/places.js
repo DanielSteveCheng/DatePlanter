@@ -16,7 +16,9 @@ export function buildPlaceSearchUrl(query, near, config = PLACE_SEARCH) {
 
 const joinParts = (...parts) => parts.filter(Boolean).join(', ');
 
-export function toPlace({ properties: p, geometry }) {
+const AREA_TYPES = new Set(['city', 'town', 'village', 'district', 'county', 'state', 'country']);
+
+function toPlace({ properties: p, geometry }) {
   const [longitude, latitude] = geometry.coordinates;
   const street = [p.housenumber, p.street].filter(Boolean).join(' ') || null;
   const locality = p.city ?? p.town ?? p.village ?? p.county;
@@ -24,7 +26,7 @@ export function toPlace({ properties: p, geometry }) {
   return {
     id: `${p.osm_type}${p.osm_id}`,
     name,
-    label: joinParts(name, name === locality ? p.state : locality),
+    label: joinParts(name, AREA_TYPES.has(p.type) || name === locality ? p.state : locality),
     address: joinParts(street !== name && street, locality, p.state, p.country),
     latitude,
     longitude,

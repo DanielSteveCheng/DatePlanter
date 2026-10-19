@@ -1,9 +1,10 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { Surface } from '../../sprites/Surface';
+import { spriteSize } from '../../sprites/sizes';
 import { scrollTopForDrag, thumbMetrics } from '../../lib/scroll';
 import { cn } from '../../lib/cn';
 
-export function ScrollArea({ className, children }) {
+export function ScrollArea({ className, style, children }) {
   const viewportRef = useRef(null);
   const contentRef = useRef(null);
   const dragRef = useRef(null);
@@ -34,14 +35,14 @@ export function ScrollArea({ className, children }) {
   }
 
   return (
-    <div className={cn('relative flex min-h-0 flex-col', className)}>
+    <div className={cn('relative flex min-h-0 flex-col', className)} style={style}>
       <div ref={viewportRef} onScroll={measure} className="scrollbar-none min-h-0 flex-1 overflow-y-auto pr-2.5">
         <div ref={contentRef} className="p-1">
           {children}
         </div>
       </div>
       {thumb && (
-        <Surface slot="scroll-track" className="absolute inset-y-0 right-0 w-1.5 rounded-full bg-scroll-track">
+        <Surface slot="scroll-track" className="absolute inset-y-0 right-0 rounded-full bg-scroll-track" style={spriteSize('scroll-bar')}>
           <Surface
             slot="scroll-thumb"
             onPointerDown={startDrag}

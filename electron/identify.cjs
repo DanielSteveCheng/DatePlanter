@@ -9,4 +9,4 @@ function identifyApp(session, version) {
   });
 }
 
-module.exports = { IDENTIFIED_URLS, appUserAgent, identifyApp };
+module.exports = { identifyApp };

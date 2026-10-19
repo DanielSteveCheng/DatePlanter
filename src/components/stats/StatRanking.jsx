@@ -1,3 +1,5 @@
+import { Section } from '../ui/Section';
+
 const TOP_N = 5;
 
 const percent = (count, total) => Math.round((count / total) * 100);
@@ -8,8 +10,7 @@ export function StatRanking({ title, rows }) {
   const max = rows[0].count;
 
   return (
-    <section className="flex flex-col gap-1">
-      <h3 className="text-body font-bold text-card-accent">{title}</h3>
+    <Section title={title} className="flex flex-col gap-1">
       <ol className="flex flex-col gap-1">
         {rows.slice(0, TOP_N).map((row) => (
           <li
@@ -29,6 +30,6 @@ export function StatRanking({ title, rows }) {
           </li>
         ))}
       </ol>
-    </section>
+    </Section>
   );
 }

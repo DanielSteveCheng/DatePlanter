@@ -8,9 +8,9 @@ export const VINE_LAYOUT = {
   attachY: 20,
 };
 
-export const sideFor = (index) => (index % 2 === 0 ? 'right' : 'left');
+const sideFor = (index) => (index % 2 === 0 ? 'right' : 'left');
 
-export const contentHeight = (leafCount, layout = VINE_LAYOUT) => layout.topOffset + leafCount * layout.spacing;
+const contentHeight = (leafCount, layout = VINE_LAYOUT) => layout.topOffset + leafCount * layout.spacing;
 
 export const maxScroll = (leafCount, height, layout = VINE_LAYOUT) =>
   Math.max(0, contentHeight(leafCount, layout) - height);
@@ -43,4 +43,11 @@ export const stemOffsetY = (leafCount, height, layout = VINE_LAYOUT) =>
 
 export function budPosition(height, layout = VINE_LAYOUT, stem = STEM) {
   return { x: layout.width / 2 + knotX(0, stem), y: Math.round(height / 2) };
+}
+
+export function messageBudPosition(leafCount, height, layout = VINE_LAYOUT, stem = STEM) {
+  return {
+    x: layout.width / 2 + (knotX(0, stem) + knotX(1, stem)) / 2,
+    y: knotY(0, layout) + layout.spacing / 2 + stemOffsetY(leafCount, height, layout),
+  };
 }

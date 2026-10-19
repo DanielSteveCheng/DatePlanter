@@ -1,6 +1,6 @@
 import { removeById, upsertById } from '../lib/list';
 
-export function createMemoryBridge(initialGarden = { dates: [], notes: '' }) {
+export function createMemoryBridge(initialGarden = { dates: [], notes: '', messages: [] }) {
   let garden = initialGarden;
   let settings = {
     author: '',
@@ -9,6 +9,7 @@ export function createMemoryBridge(initialGarden = { dates: [], notes: '' }) {
     weatherPreview: 'live',
     devMode: false,
     keepOnTop: 'pot',
+    deviceId: 'browser',
     storage: { type: 'file', filePath: '', supabaseUrl: '', supabaseKey: '' },
   };
   const commit = (next) => Promise.resolve((garden = next));
@@ -20,6 +21,7 @@ export function createMemoryBridge(initialGarden = { dates: [], notes: '' }) {
       upsertDate: (date) => commit({ ...garden, dates: upsertById(garden.dates, date) }),
       deleteDate: (id) => commit({ ...garden, dates: removeById(garden.dates, id) }),
       saveNotes: (notes) => commit({ ...garden, notes }),
+      upsertMessage: (message) => commit({ ...garden, messages: upsertById(garden.messages, message) }),
       onChange: () => () => {},
       onError: () => () => {},
     },

@@ -1,4 +1,6 @@
-export const PIN_SIZE = { width: 28, height: 36 };
+import { SPRITE_SIZES } from '../../sprites/sizes';
+
+export const PIN_SIZE = SPRITE_SIZES['map-pin'];
 
 export const PIN_SVG = `<svg viewBox="0 0 28 36" width="${PIN_SIZE.width}" height="${PIN_SIZE.height}">
   <path d="M14 35 C14 35 2 21 2 13 A12 12 0 0 1 26 13 C26 21 14 35 14 35 Z" fill="var(--color-pin)" stroke="var(--color-pin-edge)" stroke-width="1.5" />

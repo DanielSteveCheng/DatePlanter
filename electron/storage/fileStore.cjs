@@ -47,6 +47,7 @@ function createFileStore(filePath, { pollMs = 2000, watch = true } = {}) {
     upsertDate: (date) => mutate((g) => ({ ...g, dates: upsertById(g.dates, date) })),
     deleteDate: (id) => mutate((g) => ({ ...g, dates: removeById(g.dates, id) })),
     saveNotes: (notes) => mutate((g) => ({ ...g, notes })),
+    upsertMessage: (message) => mutate((g) => ({ ...g, messages: upsertById(g.messages, message) })),
     subscribe: emitter.subscribe,
     dispose: () => watch && fs.unwatchFile(filePath, onFileChanged),
   };

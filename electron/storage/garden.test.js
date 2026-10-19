@@ -3,8 +3,12 @@ import { createEmitter, normalizeGarden, removeById, upsertById } from './garden
 
 describe('garden helpers', () => {
   it('normalizes malformed data', () => {
-    expect(normalizeGarden(null)).toEqual({ dates: [], notes: '' });
-    expect(normalizeGarden({ dates: [{ id: 'a' }, null, { title: 'no id' }], notes: 5 })).toEqual({ dates: [{ id: 'a' }], notes: '' });
+    expect(normalizeGarden(null)).toEqual({ dates: [], notes: '', messages: [] });
+    expect(normalizeGarden({ dates: [{ id: 'a' }, null, { title: 'no id' }], notes: 5, messages: [{ id: 'm' }, 'x'] })).toEqual({
+      dates: [{ id: 'a' }],
+      notes: '',
+      messages: [{ id: 'm' }],
+    });
   });
 
   it('upserts and removes by id', () => {

@@ -1,4 +1,6 @@
-const ON_TOP_MODES = ['pot', 'always', 'never'];
+// "floating" and lower levels make Electron tuck the window behind the Windows taskbar on every
+// focus, which can drop its topmost status entirely. "pop-up-menu" is a plain topmost window.
+const ON_TOP_LEVEL = 'pop-up-menu';
 
 function shouldStayOnTop(mode, collapsed) {
   if (mode === 'always') return true;
@@ -10,8 +12,17 @@ function createOnTop(win, getMode) {
   let collapsed = false;
 
   function refresh() {
-    if (!win.isDestroyed()) win.setAlwaysOnTop(shouldStayOnTop(getMode(), collapsed), 'floating');
+    if (win.isDestroyed()) return;
+    if (shouldStayOnTop(getMode(), collapsed)) {
+      win.setAlwaysOnTop(true, ON_TOP_LEVEL);
+      win.moveTop();
+    } else if (win.isAlwaysOnTop()) {
+      win.setAlwaysOnTop(false);
+    }
   }
+
+  win.on('show', refresh);
+  win.on('focus', refresh);
 
   return {
     refresh,
@@ -22,4 +33,4 @@ function createOnTop(win, getMode) {
   };
 }
 
-module.exports = { ON_TOP_MODES, createOnTop, shouldStayOnTop };
+module.exports = { createOnTop, shouldStayOnTop };

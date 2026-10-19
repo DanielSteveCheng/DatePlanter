@@ -18,7 +18,7 @@ const FIELD_DEFAULTS = Object.freeze({
   notes: '',
 });
 
-export const DATE_FIELDS = Object.keys(FIELD_DEFAULTS);
+const DATE_FIELDS = Object.keys(FIELD_DEFAULTS);
 
 export const emptyDateFields = () => ({ ...FIELD_DEFAULTS });
 

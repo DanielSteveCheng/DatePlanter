@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useState } from 'react';
 import { useBridge } from '../api/BridgeContext';
+import { SPRITE_SIZES } from '../sprites/sizes';
 
 const homePosition = () => ({ x: window.innerWidth / 2, y: window.innerHeight });
 
@@ -28,7 +29,7 @@ export function useMiniMode() {
     if (phase === 'expanding') setPhase('full');
     if (phase === 'collapsing') {
       setPhase('mini');
-      win.collapse();
+      win.collapse(SPRITE_SIZES['mini-pot']);
     }
   }, [phase, win]);
 

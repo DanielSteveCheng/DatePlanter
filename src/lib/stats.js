@@ -11,7 +11,7 @@ const TIMES_OF_DAY = [
   { before: 24, label: 'Late night' },
 ];
 
-export function parseWhen(date) {
+function parseWhen(date) {
   if (!date.when) return null;
   const parsed = new Date(date.when);
   return Number.isNaN(parsed.getTime()) ? null : parsed;

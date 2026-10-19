@@ -1,145 +1,178 @@
 # Architecture
 
+Date Planter is an Electron app. The **main process** (`electron/`, Node) owns the window, settings and
+storage. The **renderer** (`src/`, React + Tailwind) is the UI. They talk only through a small API that
+`electron/preload.cjs` exposes as `window.dateplanter`.
+
+## Where things live
+
 ```
-electron/                 main process (Node): window, settings, storage
-  main.cjs                creates the frameless window
-  windowSizing.cjs        ratio-locked resizing and UI zoom
-  preload.cjs             exposes the window.dateplanter API to the UI
-  ipc.cjs                 routes API calls to the active store; swaps stores when settings change
-  settings.cjs            settings.json in the OS app-data folder
+electron/                  main process
+  main.cjs                 app start: data folder, single instance, window, wiring
+  preload.cjs              the window.dateplanter API (garden, settings, window)
+  ipc.cjs                  routes API calls to the active store and window helpers
+  settings.cjs             settings.json (incl. a random per-computer deviceId)
+  windowSizing.cjs         ratio-locked resizing and UI zoom
+  miniMode.cjs             pot mode: click-through window, dragging the pot
+  onTop.cjs                "keep on top" behaviour
+  identify.cjs             Date Planter User-Agent for map tiles and place search
+  externalLinks.cjs        opens web links in the browser, never in the app window
   storage/
-    garden.cjs            pure helpers shared by every backend
-    fileStore.cjs         JSON file backend (local or synced folder)
-    supabaseStore.cjs     Supabase REST backend
-    index.cjs             picks a backend from settings
-src/                      renderer (React + Tailwind)
-  api/                    bridge to the main process, plus an in-memory stand-in
-  lib/                    pure logic: dates, weather, vine layout, selection, stats, scrolling
-  hooks/                  React glue around lib/ and the bridge
-  sprites/                slot registry, <Sprite>, <Surface>, default SVG art
-  components/             UI, one folder per region (frame, sky, vine, dates, soil, settings)
-  styles/theme.css        design tokens (colors, font, keyframes)
+    index.cjs              picks a backend from settings
+    garden.cjs             shared helpers: normalizing, upserts, change detection
+    fileStore.cjs          JSON file (local or in a synced folder)
+    supabaseStore.cjs      Supabase REST
+src/                       renderer
+  main.jsx                 entry: fonts, CSS, BridgeProvider, <App>
+  App.jsx                  top level: data hooks, startup/loading, pot mode (WindowShell)
+  GardenApp.jsx            the open app: frame, sky, vine, soil, cards and panels
+  api/                     bridge to the main process + an in-memory stand-in
+  hooks/                   app-wide React hooks (data, settings, weather, inbox, dev mode)
+  lib/                     pure logic, no React (dates, weather, vine, stats, messages…)
+  components/              UI, one folder per area:
+    frame/                 window chrome, title bar, pot, loading, resize grip
+    sky/                   sky, weather effects, weather readout
+    vine/                  vine, stem, leaves, bud, scrolling
+    dates/                 date card, form, details, location field
+    places/                shared place search (dates' "Where" and the weather location)
+    soil/                  notes pad and ADD DATE! button
+    messages/              send panel, message bud, bubble, replies
+    settings/  stats/  map/  dev/
+    ui/                    shared building blocks (controls, Panel, CardHeader, SpeechBubble…)
+  sprites/                 sprite slots: registry, sizes, <Sprite>, <Surface>, default art
+  styles/theme.css         design tokens: colours, text sizes, font, animations
+  assets/sprites/          your custom sprite files
+scripts/
+  render-icon.cjs          renders build/icon.png for the installer
+  partner.cjs              `npm run partner`: a second window acting as the other computer
+docs/                      this file, CUSTOMIZING.md, supabase.sql
 ```
+
+Conventions:
+
+- **`lib/` is pure.** Anything with rules or maths (layout, physics, parsing, stats) lives there as
+  plain functions with tests next to them (`*.test.js`). Components stay thin.
+- **Hooks used by one component live next to it** (e.g. `components/vine/useMomentumScroll.js`).
+  `src/hooks/` holds the ones shared across the app.
+- **Tunable numbers are named config objects** at the top of their module (`STEM`, `WIND`,
+  `MOMENTUM`, `SPRITE_SIZES`…). [`CUSTOMIZING.md`](CUSTOMIZING.md) lists them all.
 
 ## Process boundary
 
-The UI never touches the file system or network credentials. It calls a small async API
-(`garden.*`, `settings.*`, `window.*`) exposed by `preload.cjs`. `src/api/memoryBridge.js` implements
-the same API in memory, so the UI also runs in a plain browser (`npx vite`) and in tests. Components
-get the bridge from `BridgeContext`, so a test can provide a fake one.
+The UI never touches the file system or credentials. It calls `window.dateplanter`:
 
-## Data model
+- `garden.load / upsertDate / deleteDate / saveNotes / upsertMessage / onChange / onError`
+- `settings.get / update / chooseFolder`
+- `window.close / collapse / expand / setPotHover / beginDrag / endDrag / onPotMoved / beginResize / endResize`
 
-The whole shared state is one **garden** document:
+`src/api/memoryBridge.js` implements the same API in memory, so the UI also runs in a plain browser
+(`npx vite`). `main.jsx` provides the bridge through `BridgeProvider`, so a test can swap in a fake.
+
+## Data
+
+Everything shared lives in one **garden** document:
 
 ```js
 {
-  dates: [{ id, title, where, when, type, activities, notes, author, createdAt, updatedAt }],
+  dates: [{ id, title, where, place, when, type, activities, notes, author, createdAt, updatedAt }],
   notes: '',
+  messages: [{ id, text, from: { deviceId, name }, replyTo, createdAt, readAt }],
 }
 ```
 
+- Ids are client-generated UUIDs, so records can be created offline.
+- `when` is a local `datetime-local` string, so it sorts as text.
 - `place` is `null` or `{ id, label, address, latitude, longitude }` when a search suggestion was
   picked. `where` is always the display text, so typed-only locations still work.
-- `id` is a client-generated UUID, so a date can be created offline without asking a server.
-- `when` is an ISO local datetime string (from `<input type="datetime-local">`), so it sorts as text.
-- `dates` is stored **unordered**. The vine's order is derived (`sortNewestFirst`: by `when`, then
-  `createdAt`). This way two people never conflict over position.
-- To add a field, add it to `DATE_FIELDS` / `emptyDateFields` in `src/lib/dates.js` and to `DateForm`.
-  No storage changes are needed.
+- `dates` is stored unordered. The vine order is derived (`sortNewestFirst`), so two people never
+  conflict over position.
+- `replyTo` is `null`/absent, or a snapshot `{ id, text, name }` of the message being replied to, so the
+  context survives even after the original is read and closed.
 
-## Storage backends
+### Who receives a message
 
-Every backend implements:
+There's no recipient field. Each computer generates a random `deviceId` the first time it runs
+(`electron/settings.cjs`), and every message records the sender's `deviceId`. A computer shows a
+message as a bud when:
 
-```
-load() → garden
-upsertDate(date) → garden
-deleteDate(id) → garden
-saveNotes(text) → garden
-subscribe(listener) → unsubscribe
-dispose()
-```
+- the message's `from.deviceId` is **not** its own, and
+- `readAt` is empty.
 
-Mutations return the full new garden, so the UI replaces its state and never merges. To add a backend
-(Firebase, your own server…), write one module with this shape and select it in `storage/index.cjs`.
+With two computers sharing a garden, that means "the other one". Closing (or replying to) the message
+sets `readAt` in the shared garden, which removes the bud everywhere and shows **Read ✓** to the sender.
+The logic is `unreadFor` in `src/lib/messages.js`.
 
-**File store.** Reads the file before every mutation, so it keeps edits that synced in from the other
-computer. Writes are atomic (temp file + rename), so sync clients never upload a half-written file.
-Remote edits are detected with `fs.watchFile` polling, which is more reliable than native watch events
-on cloud-synced folders. Upserts are per-date, but two edits within the same sync window can still
-race. The last full-file write wins.
+Things that follow from this design:
 
-**Supabase store.** Plain `fetch` against the PostgREST API (`fetchImpl` is injectable for tests).
-Each date is one row with the record in a `jsonb` column, so the schema never needs migrations.
-Saves are row-level upserts, so two people editing different dates never clash. Polls every 10 seconds.
+- Any extra computer or profile sharing the garden is also a recipient (that's how `npm run partner`
+  works). Whichever one closes the message first marks it read for all.
+- A computer's `deviceId` lives in its settings file. Deleting that file, or starting with a fresh
+  profile, creates a new id, and messages that computer sent earlier (and that are still unread) would
+  then show up on it as if they were incoming.
 
-**Change detection.** `createEmitter` remembers the last serialized garden and notifies only when the
-content differs. Your own writes don't echo back, and quiet polls cause no re-renders.
+### Storage backends
 
-## Weather
+Both backends implement `load`, `upsertDate`, `deleteDate`, `saveNotes`, `upsertMessage`, `subscribe`
+and `dispose`. Every mutation returns the full new garden, so the UI just replaces its state.
 
-`src/lib/weather.js` is pure and data-driven. Open-Meteo (free, no key) returns a WMO weather code,
-`conditionFromCode` maps it to one of six conditions, and `SCENES` maps each condition to what the sky
-draws (`sky`, `bodies`, `precipitation`, `lightning`). To add a condition, add one row plus any new
-sprite. ⚙ → *Preview weather* forces a condition, which helps when designing art.
+- **File store:** re-reads before every write (keeping edits that synced in from the other computer),
+  writes atomically (temp file + rename), and polls with `fs.watchFile`, which works reliably in
+  cloud-synced folders.
+- **Supabase store:** plain `fetch` against PostgREST. Dates and messages are one row each with the
+  record in a `jsonb` column, so adding fields never needs a migration. If the `messages` table is
+  missing (an older setup), loading carries on without messages. Polls every 10 seconds.
+- `createEmitter` notifies only when the content really changed, so your own writes don't echo back.
 
-## Vine
+`upsertById`/`removeById` exist on both sides of the process boundary (`electron/storage/garden.cjs`
+and `src/lib/list.js`) because the packaged main process can't import renderer code.
 
-`src/lib/vine.js` lays leaves out as a pure function of `(ids, scroll)`: dates newest-first from the top, alternating sides, each `spacing` px lower. Leaves are keyed by id and animate
-their `top`. When a date is planted, every older leaf slides down one slot ("the vine grows"), and the
-new leaf plays a sprout animation (`useNewIds`).
+## App lifecycle
 
-## Sprites and theming
+1. **Startup:** `App` shows the pot with a spinner (`WindowShell` phase `loading`). `useStartup`
+   waits for settings and the garden, and for the weather up to 2 s. The last forecast is cached per
+   day (`lib/forecastCache.js`), so later launches are ready in about half a second. `GardenApp` only
+   mounts once data is ready, so nothing reshuffles on screen.
+2. **Open:** the app grows out of the pot (`animate-grow`).
+3. **Pot mode:** minimize shrinks the app into the pot. The window keeps its size but becomes
+   click-through except over the pot (`miniMode.cjs`), because resizing a transparent window on
+   Windows briefly flashes stale content. Dragging moves the window; `placePot` keeps it on screen
+   and slides the pot inside it at edges.
 
-- `<Sprite slot="…">` shows `src/assets/sprites/<slot>.<ext>` if present, otherwise the default SVG.
-- `<Surface slot="…">` does the same for background textures.
-- `import.meta.glob` discovers the files at build time, so adding art needs no code.
-- Default SVGs are colored with theme variables, so recoloring only means editing `theme.css`.
-- Every themed element has a `data-slot` attribute for targeted CSS.
+## Messages UI
 
-## Window sizing
+`MessageSprout` is the bud plus its bubble, used on the vine (between the first two leaves) and on the
+pot. `placeBubble` (`src/lib/bubble.js`) positions the bubble inside the visible area, sliding it and
+capping its height so it never runs off screen; the body scrolls if needed. `ReplyForm` and the send
+panel share `useMessageDraft` for validation, sending and errors. `ReplyQuote` shows the replied-to
+message, collapsed to one line, and expands on click.
 
-Frameless transparent windows can't be resized natively on Windows, so the corner grip asks the main
-process to begin/end a resize. While it's active, main follows the cursor, fits the size to the base
-380×540 ratio (`fitToRatio`), keeps it on screen, and sets the page zoom to `width / 380`. The layout
-is only ever designed at one size and scales from there.
+Errors from storage are cleaned up by `readableError` (`src/lib/errors.js`); a missing Supabase table
+becomes an instruction to run `docs/supabase.sql`.
 
-## Pot mode (minimize)
+## Rendering pieces
 
-Minimize never resizes the window. `useMiniMode` shrinks the app into the bottom centre
-(`animate-shrink`), then `miniMode.collapse()` makes the window click-through
-(`setIgnoreMouseEvents(true, { forward: true })`) so only the `MiniPot` is interactive; hovering the
-pot turns clicks back on. Expanding is the reverse: the pot fades out in place while the app grows
-from it (`animate-grow`). Avoiding a resize matters on Windows, which briefly shows the old frame
-stretched from the top-left corner whenever a transparent window changes size.
-
-Dragging the pot moves the invisible window with it. `placePot` in `electron/miniMode.cjs` keeps the
-window on screen and slides the pot within it once the window hits an edge, so the app always opens
-fully visible and grows from wherever the pot is.
-
-## Places and map
-
-`src/lib/places.js` queries Photon (OpenStreetMap geocoding, free, no key) and turns results into
-places; `placeKey`/`placeLabel` give stats one identity per real place, falling back to typed text.
-`src/components/map/DateMap.jsx` renders OpenStreetMap tiles with Leaflet, one pin per place
-(`groupDatesByPlace`). OSM's tile policy asks apps to identify themselves, so `electron/identify.cjs`
-sets a Date Planter User-Agent on tile and search requests. `electron/externalLinks.cjs` opens any
-link (like the map attribution) in the browser instead of navigating the app window.
-
-## Stats
-
-`computeStats(dates, now)` in `src/lib/stats.js` derives everything the stats panel shows. Rankings
-share one helper, `rankBy(items, keyOf, labelOf)`, so adding a new breakdown is one line there and
-one `<StatRanking>` in `StatsPanel`.
+- **Weather:** `lib/weather.js` maps Open-Meteo codes to six conditions. Each condition's **scene**
+  (`SCENES`) says which sky, bodies, particles, lightning and wind to show. Developer mode can force
+  any condition (`activeCondition`).
+- **Vine:** `lib/vine.js` lays leaves out as a pure function of their order. `lib/stem.js` draws the
+  curved stem from a seeded noise function, so the shape is identical on both computers; leaves attach
+  exactly at the stem's bend points. Scrolling is one GPU transform on a track holding the stem and
+  leaves, driven by momentum physics (`lib/momentum.js`).
+- **Places and map:** `lib/places.js` queries Photon (OpenStreetMap, free, no key). `PlaceSearch` is
+  the shared search box for a date's *Where* and the weather location. `DateMap` renders OpenStreetMap
+  tiles with Leaflet, one pin per place (`groupDatesByPlace`).
+- **Stats:** `computeStats` derives everything the stats panel shows; rankings share `rankBy`.
+- **Sprites:** `<Sprite slot>` and `<Surface slot>` use `src/assets/sprites/<slot>.*` when present,
+  otherwise the default art. Sizes come from `sprites/sizes.js`. See [`CUSTOMIZING.md`](CUSTOMIZING.md).
 
 ## Developer mode
 
-`settings.devMode` (toggled by Ctrl+Shift+D via `useDevMode`) shows `DevToolbar`. The weather preview
-only applies while dev mode is on (`activeCondition`). **Slots** adds a `show-slots` class that outlines
-every `[data-slot]` element.
+Ctrl+Shift+D (or ⚙ → Developer) toggles `settings.devMode`. The toolbar can force weather, outline
+every sprite slot, and add **temporary** leaves and messages (`lib/devFixtures.js`). Those live only
+in memory (`useLocalRecords`), are never saved or shared, and are recognised by their `dev-` id prefix
+(`isDevRecord`).
 
 ## Testing
 
-`npm test` runs Vitest over `src/lib`, the sprite registry and the storage backends (the file store
-against a temp directory, Supabase against a fake `fetch`).
+`npm test` runs Vitest over `src/lib`, hooks, the sprite registry, and every `electron/` module
+(storage against a temp folder and a fake `fetch`, window maths as pure functions).

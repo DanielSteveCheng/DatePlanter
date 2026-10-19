@@ -1,17 +1,9 @@
 import { useState } from 'react';
-import { Button, Checkbox, Field, Select, TextInput } from '../ui/Field';
+import { Button, Checkbox, Field, Select, TextInput } from '../ui/controls';
 import { Panel } from '../ui/Panel';
+import { Section } from '../ui/Section';
 import { LocationPicker } from './LocationPicker';
 import { StorageSettings } from './StorageSettings';
-
-function Section({ title, children }) {
-  return (
-    <section className="flex flex-col gap-1.5">
-      <h3 className="text-body font-bold text-card-accent">{title}</h3>
-      {children}
-    </section>
-  );
-}
 
 export function SettingsPanel({ settings, onSave, onClose, onOpenStats, onOpenMap }) {
   const [draft, setDraft] = useState(settings);

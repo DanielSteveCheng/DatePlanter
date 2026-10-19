@@ -8,7 +8,7 @@ const CSP = [
   "style-src 'self' 'unsafe-inline'",
   "img-src 'self' data: blob: https://tile.openstreetmap.org",
   "font-src 'self' data:",
-  "connect-src 'self' https://api.open-meteo.com https://geocoding-api.open-meteo.com https://photon.komoot.io",
+  "connect-src 'self' https://api.open-meteo.com https://photon.komoot.io",
 ].join('; ');
 
 const injectCsp = {

@@ -1,7 +1,11 @@
 import { cn } from '../../lib/cn';
 
-const inputClass =
-  'w-full rounded-lg bg-card-field px-2 py-1 text-body text-card-text placeholder:text-card-text/60 outline-none focus:ring-2 focus:ring-card-accent';
+const INPUT_TONES = {
+  card: 'bg-card-field text-card-text placeholder:text-card-text/60 focus:ring-card-accent',
+  bubble: 'bg-black/5 text-bubble-ink placeholder:text-bubble-ink/50 focus:ring-bubble-ink/30',
+};
+
+const inputClass = (tone = 'card') => cn('w-full rounded-lg px-2 py-1 text-body outline-none focus:ring-2', INPUT_TONES[tone]);
 
 export function Field({ label, error, children }) {
   return (
@@ -13,14 +17,14 @@ export function Field({ label, error, children }) {
   );
 }
 
-export const TextInput = ({ className, ...props }) => <input className={cn(inputClass, className)} {...props} />;
+export const TextInput = ({ tone, className, ...props }) => <input className={cn(inputClass(tone), className)} {...props} />;
 
-export const TextArea = ({ className, ...props }) => (
-  <textarea className={cn(inputClass, 'min-h-12 resize-none overflow-hidden field-sizing-content', className)} {...props} />
+export const TextArea = ({ tone, className, ...props }) => (
+  <textarea className={cn(inputClass(tone), 'min-h-12 resize-none overflow-hidden field-sizing-content', className)} {...props} />
 );
 
-export const Select = ({ className, children, ...props }) => (
-  <select className={cn(inputClass, className)} {...props}>
+export const Select = ({ tone, className, children, ...props }) => (
+  <select className={cn(inputClass(tone), className)} {...props}>
     {children}
   </select>
 );
@@ -37,6 +41,8 @@ export function Button({ variant = 'primary', className, ...props }) {
     primary: 'bg-card-accent text-card hover:brightness-105',
     ghost: 'bg-transparent text-card-text hover:bg-white/10',
     danger: 'bg-transparent text-card-accent hover:bg-white/10',
+    bubble: 'bg-bubble-ink text-bubble-fill hover:brightness-110',
+    'bubble-ghost': 'bg-transparent text-bubble-ink hover:bg-black/5',
   };
   return (
     <button

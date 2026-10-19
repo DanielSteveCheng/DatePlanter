@@ -1,6 +1,6 @@
 const { screen } = require('electron');
 
-const POT_SIZE = Object.freeze({ width: 80, height: 96 });
+const DEFAULT_POT_SIZE = Object.freeze({ width: 80, height: 96 });
 const DRAG_INTERVAL_MS = 16;
 
 const clamp = (value, min, max) => Math.min(Math.max(value, min), max);
@@ -20,6 +20,7 @@ function placePot({ target, windowSize, pot, workArea }) {
 
 function createMiniMode(win, { onPotMoved, onCollapsedChange = () => {} }) {
   let collapsed = false;
+  let potSize = DEFAULT_POT_SIZE;
   let offset = null;
   let dragTimer = null;
 
@@ -32,7 +33,8 @@ function createMiniMode(win, { onPotMoved, onCollapsedChange = () => {} }) {
   }
 
   return {
-    collapse() {
+    collapse(size) {
+      if (size?.width > 0 && size?.height > 0) potSize = { width: size.width, height: size.height };
       const { width, height } = win.getBounds();
       offset = { x: width / 2, y: height };
       collapsed = true;
@@ -53,7 +55,7 @@ function createMiniMode(win, { onPotMoved, onCollapsedChange = () => {} }) {
       const start = win.getBounds();
       const cursor = screen.getCursorScreenPoint();
       const grab = { x: cursor.x - (start.x + offset.x), y: cursor.y - (start.y + offset.y) };
-      const pot = { width: POT_SIZE.width * zoom(), height: POT_SIZE.height * zoom() };
+      const pot = { width: potSize.width * zoom(), height: potSize.height * zoom() };
 
       dragTimer = setInterval(() => {
         const point = screen.getCursorScreenPoint();
@@ -77,4 +79,4 @@ function createMiniMode(win, { onPotMoved, onCollapsedChange = () => {} }) {
   };
 }
 
-module.exports = { POT_SIZE, createMiniMode, placePot };
+module.exports = { createMiniMode, placePot };

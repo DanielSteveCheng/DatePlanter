@@ -54,7 +54,7 @@ export function buildForecastUrl({ latitude, longitude }, units = 'fahrenheit') 
   return `https://api.open-meteo.com/v1/forecast?${params}`;
 }
 
-export function parseForecast(json, now = new Date()) {
+function parseForecast(json, now = new Date()) {
   return {
     dayName: now.toLocaleDateString(undefined, { weekday: 'long' }),
     high: Math.round(json.daily.temperature_2m_max[0]),
@@ -67,23 +67,6 @@ export async function fetchForecast(location, units, fetchImpl = fetch) {
   const response = await fetchImpl(buildForecastUrl(location, units));
   if (!response.ok) throw new Error(`Weather request failed (${response.status})`);
   return parseForecast(await response.json());
-}
-
-export const buildGeocodeUrl = (query) =>
-  `https://geocoding-api.open-meteo.com/v1/search?${new URLSearchParams({ name: query, count: '5' })}`;
-
-export function parseGeocode(json) {
-  return (json.results ?? []).map((place) => ({
-    name: [place.name, place.admin1, place.country_code].filter(Boolean).join(', '),
-    latitude: place.latitude,
-    longitude: place.longitude,
-  }));
-}
-
-export async function searchPlaces(query, fetchImpl = fetch) {
-  const response = await fetchImpl(buildGeocodeUrl(query));
-  if (!response.ok) throw new Error(`Location search failed (${response.status})`);
-  return parseGeocode(await response.json());
 }
 
 export const activeCondition = ({ devMode, weatherPreview }, forecast) =>

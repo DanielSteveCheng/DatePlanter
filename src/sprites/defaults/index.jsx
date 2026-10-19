@@ -146,3 +146,21 @@ export function LoadingSpinner(props) {
     </svg>
   );
 }
+
+export function MessageBud(props) {
+  return (
+    <svg viewBox="0 0 24 32" {...props}>
+      <path d="M12 3 C18 9 19 17 12 25 C5 17 6 9 12 3 Z" fill="var(--color-message-bud)" />
+      <path d="M12 31 C6 29 4 23 5 18 C8 22 10 24 12 26 Z" fill="var(--color-leaf)" />
+      <path d="M12 31 C18 29 20 23 19 18 C16 22 14 24 12 26 Z" fill="var(--color-leaf)" />
+      <path d="M12 18 C8.5 15.5 8.5 12 11 12 C11.6 12 11.9 12.5 12 13 C12.1 12.5 12.4 12 13 12 C15.5 12 15.5 15.5 12 18 Z" fill="var(--color-message-heart)" />
+    </svg>
+  );
+}
+
+export const IconMessage = (props) => (
+  <TitleIcon {...props}>
+    <rect x="2" y="3.5" width="12" height="9" rx="2" />
+    <path d="M2.8 4.6 L8 8.6 L13.2 4.6" />
+  </TitleIcon>
+);

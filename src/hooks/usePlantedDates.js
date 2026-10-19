@@ -1,5 +1,5 @@
 import { useMemo } from 'react';
-import { isDevDate } from '../lib/devDates';
+import { isDevRecord } from '../lib/devFixtures';
 import { sortNewestFirst } from '../lib/dates';
 
 export function usePlantedDates(garden, dev) {
@@ -10,7 +10,7 @@ export function usePlantedDates(garden, dev) {
 
   return {
     dates,
-    saveDate: async (date) => (isDevDate(date) ? dev.saveDate(date) : garden.saveDate(date)),
-    deleteDate: async (id) => (isDevDate({ id }) ? dev.deleteDate(id) : garden.deleteDate(id)),
+    saveDate: async (date) => (isDevRecord(date) ? dev.saveDate(date) : garden.saveDate(date)),
+    deleteDate: async (id) => (isDevRecord({ id }) ? dev.deleteDate(id) : garden.deleteDate(id)),
   };
 }

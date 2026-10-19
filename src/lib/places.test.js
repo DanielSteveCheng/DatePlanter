@@ -43,6 +43,11 @@ describe('parsePlaceSearch', () => {
     expect(places.map((p) => p.label)).toEqual(['Pittsburgh, Pennsylvania']);
   });
 
+  it('labels towns and cities by their state rather than their county', () => {
+    const city = feature({ osm_type: 'R', osm_id: 9, type: 'city', name: 'Pittsburgh', county: 'Allegheny', state: 'Pennsylvania' });
+    expect(parsePlaceSearch({ features: [city] })[0].label).toBe('Pittsburgh, Pennsylvania');
+  });
+
   it('handles an empty response', () => {
     expect(parsePlaceSearch({})).toEqual([]);
   });

@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { LIGHTNING, nextStrike } from '../lib/lightning';
+import { LIGHTNING, nextStrike } from '../../lib/lightning';
 
 export function useLightningStrikes(config = LIGHTNING) {
   const [strike, setStrike] = useState(null);

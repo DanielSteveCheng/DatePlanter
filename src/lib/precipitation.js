@@ -1,7 +1,9 @@
+import { SPRITE_SIZES } from '../sprites/sizes';
+
 export const PRECIPITATION = {
   raindrop: {
     count: 24,
-    size: 6,
+    size: SPRITE_SIZES.raindrop,
     sizeJitter: 0.3,
     minDuration: 0.6,
     maxDuration: 1.3,
@@ -11,7 +13,7 @@ export const PRECIPITATION = {
   },
   snowflake: {
     count: 18,
-    size: 6,
+    size: SPRITE_SIZES.snowflake,
     sizeJitter: 0.5,
     minDuration: 2.6,
     maxDuration: 5.2,

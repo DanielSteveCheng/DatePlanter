@@ -1,3 +1,4 @@
+const crypto = require('node:crypto');
 const fs = require('node:fs');
 const path = require('node:path');
 
@@ -8,6 +9,7 @@ const DEFAULT_SETTINGS = Object.freeze({
   weatherPreview: 'live',
   devMode: false,
   keepOnTop: 'pot',
+  deviceId: '',
   storage: { type: 'file', filePath: '', supabaseUrl: '', supabaseKey: '' },
 });
 
@@ -22,7 +24,7 @@ function mergeSettings(base, patch = {}) {
 function createSettingsStore(filePath) {
   let current = mergeSettings(DEFAULT_SETTINGS, readJson(filePath));
 
-  return {
+  const store = {
     get: () => current,
     update(patch) {
       current = mergeSettings(current, patch);
@@ -31,6 +33,8 @@ function createSettingsStore(filePath) {
       return current;
     },
   };
+  if (!current.deviceId) store.update({ deviceId: crypto.randomUUID() });
+  return store;
 }
 
 function readJson(filePath) {
@@ -41,4 +45,4 @@ function readJson(filePath) {
   }
 }
 
-module.exports = { createSettingsStore, mergeSettings, DEFAULT_SETTINGS };
+module.exports = { createSettingsStore };

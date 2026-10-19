@@ -13,7 +13,16 @@ function Chip({ active, onClick, children }) {
   );
 }
 
-export function DevToolbar({ weatherPreview, onPreview, showSlots, onToggleSlots, leafCount, onAddLeaves, onClearLeaves }) {
+export function DevToolbar({
+  weatherPreview,
+  onPreview,
+  showSlots,
+  onToggleSlots,
+  leafCount,
+  onAddLeaves,
+  onClearLeaves,
+  onAddMessage,
+}) {
   return (
     <div
       data-slot="dev-toolbar"
@@ -32,6 +41,7 @@ export function DevToolbar({ weatherPreview, onPreview, showSlots, onToggleSlots
       <Chip onClick={() => onAddLeaves(1)}>+1 leaf</Chip>
       <Chip onClick={() => onAddLeaves(5)}>+5</Chip>
       {leafCount > 0 && <Chip onClick={onClearLeaves}>clear {leafCount}</Chip>}
+      <Chip onClick={onAddMessage}>+message</Chip>
     </div>
   );
 }

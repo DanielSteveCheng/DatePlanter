@@ -15,6 +15,7 @@ contextBridge.exposeInMainWorld('dateplanter', {
     upsertDate: invoke('garden:upsertDate'),
     deleteDate: invoke('garden:deleteDate'),
     saveNotes: invoke('garden:saveNotes'),
+    upsertMessage: invoke('garden:upsertMessage'),
     onChange: (callback) => listen('garden:changed', callback),
     onError: (callback) => listen('garden:error', callback),
   },
@@ -24,7 +25,7 @@ contextBridge.exposeInMainWorld('dateplanter', {
     chooseFolder: invoke('settings:chooseFolder'),
   },
   window: {
-    collapse: command('window:collapse'),
+    collapse: (potSize) => ipcRenderer.invoke('window:collapse', potSize),
     expand: command('window:expand'),
     beginDrag: command('window:beginDrag'),
     endDrag: command('window:endDrag'),

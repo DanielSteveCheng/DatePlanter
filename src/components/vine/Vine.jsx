@@ -6,17 +6,21 @@ import {
   lastStemKnot,
   layoutLeaves,
   maxScroll,
+  messageBudPosition,
   stemOffsetY,
   wheelPixels,
 } from '../../lib/vine';
 import { useElementHeight } from '../../hooks/useElementHeight';
-import { useMomentumScroll } from '../../hooks/useMomentumScroll';
-import { useNewIds } from '../../hooks/useNewIds';
+import { useMomentumScroll } from './useMomentumScroll';
+import { useNewIds } from './useNewIds';
 import { Leaf } from './Leaf';
 import { Stem } from './Stem';
 import { Bud } from './Bud';
+import { MessageSprout } from '../messages/MessageSprout';
 
-export function Vine({ dates, selectedId, onSelectDate, onPlant }) {
+const toPosition = ({ x, y }) => ({ left: x, top: y });
+
+export function Vine({ dates, selectedId, onSelectDate, onPlant, inbox }) {
   const [containerRef, height] = useElementHeight();
   const ids = useMemo(() => dates.map((date) => date.id), [dates]);
   const leaves = useMemo(() => layoutLeaves(ids), [ids]);
@@ -25,6 +29,7 @@ export function Vine({ dates, selectedId, onSelectDate, onPlant }) {
   const { scroll, push, glideBy } = useMomentumScroll(maxScroll(ids.length, height));
   const isEmpty = ids.length === 0;
   const olderCount = hiddenBelow(ids.length, scroll, height);
+  const messageBud = messageBudPosition(ids.length, height);
 
   return (
     <div
@@ -57,6 +62,14 @@ export function Vine({ dates, selectedId, onSelectDate, onPlant }) {
             onSelect={onSelectDate}
           />
         ))}
+        {height > 0 && (
+          <MessageSprout
+            inbox={inbox}
+            placement="left"
+            room={{ up: messageBud.y - scroll, down: scroll + height - messageBud.y }}
+            style={toPosition(messageBud)}
+          />
+        )}
       </div>
       {scroll > 0.5 && <ScrollHint position="top" onClick={() => glideBy(-VINE_LAYOUT.spacing)} label="Newer" />}
       {olderCount > 0 && (

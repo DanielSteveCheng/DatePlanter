@@ -1,4 +1,4 @@
-export const MIN_THUMB_SIZE = 16;
+const MIN_THUMB_SIZE = 16;
 
 export function thumbMetrics({ scrollTop, scrollHeight, clientHeight }, trackHeight, minSize = MIN_THUMB_SIZE) {
   const scrollable = scrollHeight - clientHeight;

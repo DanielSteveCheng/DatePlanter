@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
-import { MOMENTUM, clampVelocity, glideVelocity, stepMomentum } from '../lib/momentum';
+import { MOMENTUM, clampVelocity, glideVelocity, stepMomentum } from '../../lib/momentum';
 
 export function useMomentumScroll(max, config = MOMENTUM) {
   const [scroll, setScroll] = useState(0);

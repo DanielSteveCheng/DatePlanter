@@ -1,7 +1,8 @@
 import { Sprite } from '../../sprites/Sprite';
-import { useLightningStrikes } from '../../hooks/useLightningStrikes';
+import { useLightningStrikes } from './useLightningStrikes';
 import { LIGHTNING } from '../../lib/lightning';
 import { cn } from '../../lib/cn';
+import { spriteSize } from '../../sprites/sizes';
 
 export function LightningStrikes() {
   const strike = useLightningStrikes();
@@ -16,8 +17,8 @@ export function LightningStrikes() {
       <div className="absolute inset-0 bg-lightning-flash" />
       <Sprite
         slot="lightning"
-        className={cn('absolute top-0 w-14', strike.flipped && '-scale-x-100')}
-        style={{ left: `${strike.leftPercent}%` }}
+        className={cn('absolute top-0', strike.flipped && '-scale-x-100')}
+        style={{ left: `${strike.leftPercent}%`, ...spriteSize('lightning') }}
       />
     </div>
   );

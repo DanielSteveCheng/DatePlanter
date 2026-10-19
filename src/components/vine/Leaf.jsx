@@ -1,5 +1,6 @@
 import { memo } from 'react';
 import { Sprite } from '../../sprites/Sprite';
+import { spriteSize } from '../../sprites/sizes';
 import { cn } from '../../lib/cn';
 
 const SIDE_CLASSES = {
@@ -23,8 +24,8 @@ export const Leaf = memo(function Leaf({ id, label, side, x, y, index, variant, 
         aria-label={label}
         title={label}
         onClick={() => onSelect(id)}
-        className={cn('pointer-events-auto absolute top-0 block w-16 animate-sway', SIDE_CLASSES[side])}
-        style={{ animationDelay: `${-index * 0.7}s` }}
+        className={cn('pointer-events-auto absolute top-0 block animate-sway', SIDE_CLASSES[side])}
+        style={{ animationDelay: `${-index * 0.7}s`, ...spriteSize('leaf') }}
       >
         <span className={cn('block', side === 'left' && '-scale-x-100')}>
           <Sprite
