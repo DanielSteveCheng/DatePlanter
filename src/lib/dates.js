@@ -1,3 +1,10 @@
+// Built once: the first Intl formatter can take a moment to set up (noticeably on fresh Windows machines).
+const WEEKDAY_FORMAT = new Intl.DateTimeFormat(undefined, { weekday: 'long' });
+const MONTH_FORMAT = new Intl.DateTimeFormat(undefined, { month: 'long' });
+
+export const weekdayName = (date = new Date()) => WEEKDAY_FORMAT.format(date);
+export const monthName = (date) => MONTH_FORMAT.format(date);
+
 export const DATE_TYPES = [
   { id: 'dinner', label: 'Dinner' },
   { id: 'outdoors', label: 'Outdoors' },
