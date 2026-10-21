@@ -21,6 +21,9 @@ contextBridge.exposeInMainWorld('dateplanter', {
     onChange: (callback) => listen('garden:changed', callback),
     onError: (callback) => listen('garden:error', callback),
   },
+  app: {
+    copyText: invoke('app:copyText'),
+  },
   settings: {
     get: invoke('settings:get'),
     update: invoke('settings:update'),

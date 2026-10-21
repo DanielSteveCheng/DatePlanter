@@ -36,5 +36,6 @@ export function useIdentity({ garden, settings, updateSettings }) {
     create,
     update: async (patch) => me && garden.savePerson({ ...me, ...patch }),
     leave: () => updateSettings({ personId: '' }),
+    joinGarden: (storage) => updateSettings({ storage: { ...settings.storage, ...storage } }),
   };
 }

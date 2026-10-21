@@ -28,6 +28,9 @@ export function createMemoryBridge(initialGarden = { dates: [], notes: '', messa
       onChange: () => () => {},
       onError: () => () => {},
     },
+    app: {
+      copyText: (text) => navigator.clipboard.writeText(text),
+    },
     settings: {
       get: () => Promise.resolve(settings),
       update: (patch) => {

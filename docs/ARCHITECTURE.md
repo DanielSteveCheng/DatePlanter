@@ -64,6 +64,7 @@ The UI never touches the file system or credentials. It calls `window.dateplante
 
 - `garden.load / upsertDate / deleteDate / saveNotes / upsertMessage / onChange / onError`
 - `settings.get / update / chooseFolder`
+- `app.copyText`
 - `window.close / collapse / expand / setPotHover / beginDrag / endDrag / onPotMoved / beginResize / endResize`
 
 `src/api/memoryBridge.js` implements the same API in memory, so the UI also runs in a plain browser
@@ -111,6 +112,10 @@ marks it read everywhere (Daniel sees **Read ✓**). Messages from before people
 they go to whoever didn't send them, recognised through the person's `deviceIds`.
 
 ⚙ → **Switch person** clears this computer's `personId` and shows the setup screen again.
+
+**Invite codes** (`src/lib/invite.js`) pack a Supabase URL and key into one `DP1.<base64url>` string, so
+a new computer joins a garden with one paste (on the setup screen or in ⚙ → Sharing). Copying uses the
+`app.copyText` bridge call, which writes to the clipboard from the main process.
 
 ### Storage backends
 

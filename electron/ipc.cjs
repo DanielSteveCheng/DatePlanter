@@ -1,5 +1,5 @@
 const path = require('node:path');
-const { ipcMain, dialog } = require('electron');
+const { clipboard, ipcMain, dialog } = require('electron');
 const { createStore, storageKey } = require('./storage/index.cjs');
 
 const SHARED_FILE_NAME = 'date-planter.json';
@@ -45,6 +45,7 @@ function registerIpc({ win, settings, resizer, miniMode, onTop, defaultDataPath 
     'settings:get': () => settings.get(),
     'settings:update': updateSettings,
     'settings:chooseFolder': chooseFolder,
+    'app:copyText': (text) => clipboard.writeText(String(text)),
     'window:collapse': (potSize) => miniMode.collapse(potSize),
     'window:expand': () => miniMode.expand(),
     'window:setPotHover': (hovering) => miniMode.setPotHover(Boolean(hovering)),
