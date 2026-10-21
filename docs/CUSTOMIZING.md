@@ -17,7 +17,7 @@ to swap art.
 3. Put it in `src/assets/sprites/`.
 4. Run `npm run dev`. If it was already running and the new art doesn't show, restart it.
 5. Tweak its size in `src/sprites/sizes.js` if needed.
-6. When you're happy, run `npm run dist` to build a new installer that includes your art.
+6. When you're happy, run `npm run dist:win` (or `npm run dist:mac` for mac) to build a new installer that includes your art.
 
 To go back to the built-in art, delete (or rename) your file.
 

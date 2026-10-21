@@ -25,7 +25,8 @@ npm install
 npm run dev      # Vite + Electron with hot reload
 npm test         # unit tests (Vitest)
 npm start        # production build, run in Electron
-npm run dist     # build the Windows installer -> release/Date-Planter-Setup-<version>.exe
+npm run dist:win # Windows installer -> release/Date-Planter-Setup-<version>.exe (run on Windows)
+npm run dist:mac # Mac disk image  -> release/Date-Planter-<version>-mac.dmg (run on a Mac)
 npm run icon     # re-render build/icon.png from the pot sprite and theme colours
 ```
 
@@ -33,13 +34,43 @@ Changes to files in `electron/` need a restart of `npm run dev`; UI changes relo
 
 ## Installing
 
-Run `release/Date-Planter-Setup-<version>.exe` on each computer. It installs Date Planter for the
-current user and adds Start menu and desktop shortcuts. The installer isn't code-signed, so Windows
-SmartScreen may warn the first time: choose **More info → Run anyway**.
+### Windows
 
-The installed app uses the same data folder as `npm run dev` (`%APPDATA%\date-planter`), so your
-garden and settings carry over. To release a new version, bump `version` in `package.json` and run
-`npm run dist` again.
+Run `release/Date-Planter-Setup-<version>.exe`. It installs Date Planter for the current user and
+adds Start menu and desktop shortcuts. The installer isn't code-signed, so Windows SmartScreen may warn
+the first time: choose **More info → Run anyway**.
+
+### Mac
+
+Mac apps can only be built on a Mac, so there are two ways to get `Date-Planter-<version>-mac.dmg`:
+
+- **Let GitHub build it (no Mac needed).** Push the project to GitHub, open the repository's
+  **Actions** tab, pick **Build installers** and click **Run workflow**. When it finishes (about
+  10 minutes), download **Date-Planter-mac** from the run's **Artifacts** section. It builds the
+  Windows installer too (**Date-Planter-windows**). Pushing a version tag such as `v1.0.1` also runs it.
+- **Build on the Mac.** Install [Node.js](https://nodejs.org) (LTS), copy the project over, then run
+  `npm install` and `npm run dist:mac`.
+
+The `.dmg` is one "universal" app that runs on both Apple Silicon and Intel Macs. To install it, open
+the `.dmg` and drag **Date Planter** into **Applications**.
+
+The app isn't signed with a paid Apple Developer certificate, so the first launch is blocked with a
+message like *"Apple could not verify Date Planter is free of malware"*. To allow it once:
+
+1. Try to open Date Planter, and click **Done** (or **Cancel**) on the warning.
+2. Open **System Settings → Privacy & Security**, scroll down, and click **Open Anyway** next to the
+   Date Planter message. Confirm with your password.
+
+(Alternatively, in Terminal: `xattr -dr com.apple.quarantine "/Applications/Date Planter.app"`.)
+
+On a Mac, shortcuts use **Cmd** where this README says Ctrl (e.g. Cmd+Shift+D for developer mode).
+
+### Data and updates
+
+The installed app keeps its data in `%APPDATA%\date-planter` on Windows and
+`~/Library/Application Support/date-planter` on a Mac (the same folder `npm run dev` uses), so your
+garden and settings carry over. To release a new version, bump `version` in `package.json` and build
+again.
 
 ## Sharing between two computers
 

@@ -46,6 +46,7 @@ scripts/
   render-icon.cjs          renders build/icon.png for the installer
   partner.cjs              `npm run partner`: a second window acting as the other computer
 docs/                      this file, CUSTOMIZING.md, supabase.sql
+.github/workflows/          build-installers.yml: builds the Mac .dmg and Windows .exe on GitHub
 ```
 
 Conventions:
@@ -176,3 +177,13 @@ in memory (`useLocalRecords`), are never saved or shared, and are recognised by 
 
 `npm test` runs Vitest over `src/lib`, hooks, the sprite registry, and every `electron/` module
 (storage against a temp folder and a fake `fetch`, window maths as pure functions).
+
+## Packaging
+
+`electron-builder` (config in `package.json` → `build`) makes a Windows NSIS installer and a universal
+macOS `.dmg`. Mac builds only run on macOS, so `.github/workflows/build-installers.yml` builds both on
+GitHub's runners (manually from the Actions tab, or on a `v*` tag). The Mac app is ad-hoc signed
+(`identity: "-"`) because Apple Silicon refuses unsigned code; it isn't notarized, so first launch needs
+**Open Anyway** in Privacy & Security. Platform differences in the main process are kept small:
+the always-on-top level (`onTop.cjs`) and the data folder location, both handled by Electron's
+platform paths.

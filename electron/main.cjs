@@ -24,6 +24,7 @@ function createWindow() {
     ...windowOptions(),
     frame: false,
     transparent: true,
+    hasShadow: false,
     backgroundColor: '#00000000',
     webPreferences: {
       preload: path.join(__dirname, 'preload.cjs'),
