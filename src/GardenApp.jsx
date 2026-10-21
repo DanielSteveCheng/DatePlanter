@@ -14,10 +14,8 @@ import { DevToolbar } from './components/dev/DevToolbar';
 import { IconButton } from './components/ui/IconButton';
 import { usePlantedDates } from './hooks/usePlantedDates';
 import { CLOSED, selectionReducer } from './lib/selection';
-import { createDate, updateDate } from './lib/dates';
+import { createDate, updateDate, weekdayName } from './lib/dates';
 import { activeCondition, sceneFor } from './lib/weather';
-
-const today = () => new Date().toLocaleDateString(undefined, { weekday: 'long' });
 
 export function GardenApp({ settings, updateSettings, garden, weather, dev, identity, inbox, onMinimize }) {
   const [selection, dispatch] = useReducer(selectionReducer, CLOSED);
@@ -69,7 +67,7 @@ export function GardenApp({ settings, updateSettings, garden, weather, dev, iden
         <DevToolbar dev={dev} weatherPreview={settings.weatherPreview} />
       )}
       <Sky scene={sceneFor(condition)}>
-        <WeatherReadout weather={weather} units={settings.units} dayName={today()} onSetLocation={() => setOverlay('settings')} />
+        <WeatherReadout weather={weather} units={settings.units} dayName={weekdayName()} onSetLocation={() => setOverlay('settings')} />
         <Vine
           dates={planted.dates}
           selectedId={selection.dateId}

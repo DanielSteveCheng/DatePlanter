@@ -1,4 +1,4 @@
-import { typeLabel } from './dates';
+import { monthName, typeLabel } from './dates';
 import { placeKey, placeLabel } from './places';
 
 const DAY_MS = 24 * 60 * 60 * 1000;
@@ -61,7 +61,7 @@ export function computeStats(dates, now = new Date()) {
     byWeekday: rankBy(timed, (entry) => WEEKDAYS[entry.when.getDay()]),
     byTimeOfDay: rankBy(timed, (entry) => timeOfDay(entry.when)),
     byLocation: rankBy(dates, placeKey, (_key, date) => placeLabel(date)),
-    byMonth: rankBy(timed, (entry) => entry.when.toLocaleDateString(undefined, { month: 'long' })),
+    byMonth: rankBy(timed, (entry) => monthName(entry.when)),
     byAuthor: rankBy(dates, (date) => date.author?.trim()),
   };
 }

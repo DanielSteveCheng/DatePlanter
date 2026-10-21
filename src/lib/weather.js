@@ -1,3 +1,5 @@
+import { weekdayName } from './dates';
+
 export const CONDITIONS = ['sunny', 'partly', 'cloudy', 'rain', 'thunder', 'snow'];
 
 export const SCENES = {
@@ -56,7 +58,7 @@ export function buildForecastUrl({ latitude, longitude }, units = 'fahrenheit') 
 
 function parseForecast(json, now = new Date()) {
   return {
-    dayName: now.toLocaleDateString(undefined, { weekday: 'long' }),
+    dayName: weekdayName(now),
     high: Math.round(json.daily.temperature_2m_max[0]),
     low: Math.round(json.daily.temperature_2m_min[0]),
     condition: conditionFromCode(json.current.weather_code),
