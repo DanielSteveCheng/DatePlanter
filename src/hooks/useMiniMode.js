@@ -1,0 +1,37 @@
+import { useCallback, useEffect, useState } from 'react';
+import { useBridge } from '../api/BridgeContext';
+import { SPRITE_SIZES } from '../sprites/sizes';
+
+const homePosition = () => ({ x: window.innerWidth / 2, y: window.innerHeight });
+
+export const originAt = ({ x, y }) => `${x}px ${y}px`;
+
+export function useMiniMode() {
+  const { window: win } = useBridge();
+  const [phase, setPhase] = useState('loading');
+  const [pot, setPot] = useState(homePosition);
+
+  useEffect(() => win.onPotMoved(setPot), [win]);
+
+  const collapse = useCallback(() => {
+    setPot(homePosition());
+    setPhase('collapsing');
+  }, []);
+
+  const expand = useCallback(() => {
+    win.expand();
+    setPhase('expanding');
+  }, [win]);
+
+  const reveal = useCallback(() => setPhase((current) => (current === 'loading' ? 'expanding' : current)), []);
+
+  const finishAnimation = useCallback(() => {
+    if (phase === 'expanding') setPhase('full');
+    if (phase === 'collapsing') {
+      setPhase('mini');
+      win.collapse(SPRITE_SIZES['mini-pot']);
+    }
+  }, [phase, win]);
+
+  return { phase, pot, collapse, expand, reveal, finishAnimation };
+}

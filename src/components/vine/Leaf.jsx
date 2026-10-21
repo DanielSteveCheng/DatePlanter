@@ -1,0 +1,39 @@
+import { memo } from 'react';
+import { Sprite } from '../../sprites/Sprite';
+import { spriteSize } from '../../sprites/sizes';
+import { cn } from '../../lib/cn';
+
+const SIDE_CLASSES = {
+  right: 'left-1/2 origin-left',
+  left: 'right-1/2 origin-right',
+};
+
+const SLOT_FOR_VARIANT = {
+  selected: 'leaf-selected',
+  leaf: 'leaf',
+};
+
+export const Leaf = memo(function Leaf({ id, label, side, x, y, index, variant, isNew, onSelect }) {
+  return (
+    <div
+      className="pointer-events-none absolute inset-x-0 transition-[top,translate] duration-700 ease-out"
+      style={{ top: y, translate: `${x}px 0` }}
+    >
+      <button
+        type="button"
+        aria-label={label}
+        title={label}
+        onClick={() => onSelect(id)}
+        className={cn('pointer-events-auto absolute top-0 block animate-sway', SIDE_CLASSES[side])}
+        style={{ animationDelay: `${-index * 0.7}s`, ...spriteSize('leaf') }}
+      >
+        <span className={cn('block', side === 'left' && '-scale-x-100')}>
+          <Sprite
+            slot={SLOT_FOR_VARIANT[variant]}
+            className={cn('block w-full origin-left transition hover:brightness-110', isNew && 'animate-sprout')}
+          />
+        </span>
+      </button>
+    </div>
+  );
+});
