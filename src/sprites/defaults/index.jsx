@@ -164,3 +164,9 @@ export const IconMessage = (props) => (
     <path d="M2.8 4.6 L8 8.6 L13.2 4.6" />
   </TitleIcon>
 );
+
+export const IconDelete = (props) => (
+  <TitleIcon {...props}>
+    <path d="M3 4.5 H13 M6.5 4.5 V3 H9.5 V4.5 M4.5 4.5 L5.2 13 H10.8 L11.5 4.5 M7 7 V10.5 M9 7 V10.5" strokeLinejoin="round" />
+  </TitleIcon>
+);

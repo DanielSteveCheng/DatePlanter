@@ -1,12 +1,12 @@
 export const CONDITIONS = ['sunny', 'partly', 'cloudy', 'rain', 'thunder', 'snow'];
 
 export const SCENES = {
-  sunny: { sky: 'clear', bodies: ['sun'], precipitation: null, lightning: false, wind: 'calm' },
-  partly: { sky: 'clear', bodies: ['sun', 'cloud'], precipitation: null, lightning: false, wind: 'calm' },
-  cloudy: { sky: 'overcast', bodies: ['cloud'], precipitation: null, lightning: false, wind: 'calm' },
-  rain: { sky: 'overcast', bodies: ['cloud'], precipitation: 'raindrop', lightning: false, wind: 'breezy' },
-  thunder: { sky: 'overcast', bodies: ['cloud-bolt', 'cloud'], precipitation: 'raindrop', lightning: true, wind: 'stormy' },
-  snow: { sky: 'snow', bodies: ['cloud-snowflake', 'cloud'], precipitation: 'snowflake', lightning: false, wind: 'calm' },
+  sunny: { sky: 'clear', bodies: ['sun'], precipitation: null, lightning: false, wind: 'calm', backdrop: null },
+  partly: { sky: 'clear', bodies: ['sun', 'cloud'], precipitation: null, lightning: false, wind: 'calm', backdrop: null },
+  cloudy: { sky: 'overcast', bodies: ['cloud'], precipitation: null, lightning: false, wind: 'calm', backdrop: 'clouds' },
+  rain: { sky: 'overcast', bodies: ['cloud'], precipitation: 'raindrop', lightning: false, wind: 'breezy', backdrop: null },
+  thunder: { sky: 'overcast', bodies: ['cloud-bolt', 'cloud'], precipitation: 'raindrop', lightning: true, wind: 'stormy', backdrop: null },
+  snow: { sky: 'snow', bodies: ['cloud-snowflake', 'cloud'], precipitation: 'snowflake', lightning: false, wind: 'calm', backdrop: null },
 };
 
 export const WIND = {

@@ -10,6 +10,7 @@ const DEFAULT_SETTINGS = Object.freeze({
   devMode: false,
   keepOnTop: 'pot',
   deviceId: '',
+  personId: '',
   storage: { type: 'file', filePath: '', supabaseUrl: '', supabaseKey: '' },
 });
 

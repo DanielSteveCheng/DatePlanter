@@ -11,7 +11,7 @@ electron/                  main process
   main.cjs                 app start: data folder, single instance, window, wiring
   preload.cjs              the window.dateplanter API (garden, settings, window)
   ipc.cjs                  routes API calls to the active store and window helpers
-  settings.cjs             settings.json (incl. a random per-computer deviceId)
+  settings.cjs             settings.json (incl. this computer's deviceId and personId)
   windowSizing.cjs         ratio-locked resizing and UI zoom
   miniMode.cjs             pot mode: click-through window, dragging the pot
   onTop.cjs                "keep on top" behaviour
@@ -77,7 +77,8 @@ Everything shared lives in one **garden** document:
 {
   dates: [{ id, title, where, place, when, type, activities, notes, author, createdAt, updatedAt }],
   notes: '',
-  messages: [{ id, text, from: { deviceId, name }, replyTo, createdAt, readAt }],
+  messages: [{ id, text, from: { personId, deviceId, name }, to, replyTo, createdAt, readAt }],
+  people: [{ id, name, deviceIds, location, createdAt }],
 }
 ```
 
@@ -90,38 +91,40 @@ Everything shared lives in one **garden** document:
 - `replyTo` is `null`/absent, or a snapshot `{ id, text, name }` of the message being replied to, so the
   context survives even after the original is read and closed.
 
-### Who receives a message
+### People and who receives a message
 
-There's no recipient field. Each computer generates a random `deviceId` the first time it runs
-(`electron/settings.cjs`), and every message records the sender's `deviceId`. A computer shows a
-message as a bud when:
+A garden belongs to **two people** (`MAX_PEOPLE` in `src/lib/people.js`), e.g. Daniel and Rachel. Each
+person can use several computers:
 
-- the message's `from.deviceId` is **not** its own, and
-- `readAt` is empty.
+- Every computer has a random `deviceId` (`electron/settings.cjs`).
+- The first time a computer opens a garden, it asks **"Who's this plant for?"**. You either pick an
+  existing person (adding this computer to their `deviceIds`) or create yourself. A third person can't
+  be added. The choice is stored as `personId` in that computer's settings.
+- Your name and weather location live on your person, so a new computer set up as "Daniel" gets
+  Daniel's name and location automatically. Renaming yourself in ⚙ renames you everywhere.
 
-With two computers sharing a garden, that means "the other one". Closing (or replying to) the message
-sets `readAt` in the shared garden, which removes the bud everywhere and shows **Read ✓** to the sender.
-The logic is `unreadFor` in `src/lib/messages.js`.
+Messages are addressed to a **person**, not a computer: `from` records the sender's person and
+computer, and `to` is the other person's id. A computer shows a message as a bud when `to` is its own
+person and `readAt` is empty (`unreadFor` in `src/lib/messages.js`). So Daniel's messages appear on all
+of Rachel's computers and never on Daniel's own, and closing or replying on any of Rachel's computers
+marks it read everywhere (Daniel sees **Read ✓**). Messages from before people existed have no `to`;
+they go to whoever didn't send them, recognised through the person's `deviceIds`.
 
-Things that follow from this design:
-
-- Any extra computer or profile sharing the garden is also a recipient (that's how `npm run partner`
-  works). Whichever one closes the message first marks it read for all.
-- A computer's `deviceId` lives in its settings file. Deleting that file, or starting with a fresh
-  profile, creates a new id, and messages that computer sent earlier (and that are still unread) would
-  then show up on it as if they were incoming.
+⚙ → **Switch person** clears this computer's `personId` and shows the setup screen again.
 
 ### Storage backends
 
-Both backends implement `load`, `upsertDate`, `deleteDate`, `saveNotes`, `upsertMessage`, `subscribe`
-and `dispose`. Every mutation returns the full new garden, so the UI just replaces its state.
+Both backends implement `load`, `upsertDate`, `deleteDate`, `saveNotes`, `upsertMessage`,
+`deleteMessage`, `upsertPerson`, `subscribe` and `dispose`. Every mutation returns the full new garden, so the UI just replaces its state.
 
 - **File store:** re-reads before every write (keeping edits that synced in from the other computer),
   writes atomically (temp file + rename), and polls with `fs.watchFile`, which works reliably in
   cloud-synced folders.
 - **Supabase store:** plain `fetch` against PostgREST. Dates and messages are one row each with the
   record in a `jsonb` column, so adding fields never needs a migration. If the `messages` table is
-  missing (an older setup), loading carries on without messages. Polls every 10 seconds.
+  missing (an older setup), loading carries on without messages. People are stored as `person:<id>`
+  rows in the existing `shared` table (next to `notes`), so they need no new table. Polls every 10
+  seconds.
 - `createEmitter` notifies only when the content really changed, so your own writes don't echo back.
 
 `upsertById`/`removeById` exist on both sides of the process boundary (`electron/storage/garden.cjs`
@@ -153,7 +156,8 @@ becomes an instruction to run `docs/supabase.sql`.
 ## Rendering pieces
 
 - **Weather:** `lib/weather.js` maps Open-Meteo codes to six conditions. Each condition's **scene**
-  (`SCENES`) says which sky, bodies, particles, lightning and wind to show. Developer mode can force
+  (`SCENES`) says which sky, bodies, particles, lightning, wind and backdrop (drifting background
+  clouds, `lib/backdrop.js`) to show. Developer mode can force
   any condition (`activeCondition`).
 - **Vine:** `lib/vine.js` lays leaves out as a pure function of their order. `lib/stem.js` draws the
   curved stem from a seeded noise function, so the shape is identical on both computers; leaves attach
@@ -169,7 +173,7 @@ becomes an instruction to run `docs/supabase.sql`.
 ## Developer mode
 
 Ctrl+Shift+D (or ⚙ → Developer) toggles `settings.devMode`. The toolbar can force weather, outline
-every sprite slot, and add **temporary** leaves and messages (`lib/devFixtures.js`). Those live only
+every sprite slot, and add (and clear) **temporary** leaves and messages (`lib/devFixtures.js`). Those live only
 in memory (`useLocalRecords`), are never saved or shared, and are recognised by their `dev-` id prefix
 (`isDevRecord`).
 

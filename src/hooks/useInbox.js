@@ -1,18 +1,31 @@
 import { useMemo } from 'react';
 import { isDevRecord } from '../lib/devFixtures';
-import { createMessage, markRead, sentBy, unreadFor } from '../lib/messages';
+import { conversationFor, createMessage, markRead, unreadFor } from '../lib/messages';
 
-export function useInbox({ garden, dev, settings }) {
-  const deviceId = settings?.deviceId;
+const NO_PARTNER = "Your partner hasn't set up their plant yet.";
+
+export function useInbox({ garden, dev, identity, settings }) {
+  const { me, partner } = identity;
   const messages = garden.messages;
 
-  const unread = useMemo(() => unreadFor([...messages, ...dev.messages], deviceId), [messages, dev.messages, deviceId]);
-  const sent = useMemo(() => sentBy(messages, deviceId), [messages, deviceId]);
+  const all = useMemo(() => [...messages, ...dev.messages], [messages, dev.messages]);
+  const unread = useMemo(() => unreadFor(all, me), [all, me]);
+  const conversation = useMemo(() => conversationFor(all, me), [all, me]);
+
+  async function send(text, replyTo) {
+    const to = replyTo?.from?.personId ?? partner?.id;
+    if (!me || !to) throw new Error(NO_PARTNER);
+    const from = { personId: me.id, deviceId: settings.deviceId, name: me.name };
+    return garden.saveMessage(createMessage(text, { from, to, replyTo }));
+  }
 
   return {
     unread,
-    sent,
-    send: (text, replyTo) => garden.saveMessage(createMessage(text, { from: { deviceId, name: settings.author }, replyTo })),
+    conversation,
+    me,
+    recipient: partner,
+    send,
     dismiss: (message) => (isDevRecord(message) ? dev.saveMessage(markRead(message)) : garden.saveMessage(markRead(message))),
+    remove: (message) => (isDevRecord(message) ? dev.deleteMessage(message.id) : garden.deleteMessage(message.id)),
   };
 }

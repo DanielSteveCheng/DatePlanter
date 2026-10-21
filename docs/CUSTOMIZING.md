@@ -49,6 +49,7 @@ these proportions always hold.
 | `icon-settings` | image | Title bar button: settings | square | Built-in icons are drawn in `--color-titlebar-text`; your images keep their own colours. |
 | `icon-minimize` | image | Title bar button: collapse to the pot | square | |
 | `icon-close` | image | Close buttons (title bar, cards, panels, bubbles) | square | |
+| `icon-delete` | image | Trash button on messages in the ✉ panel | square | |
 | `resize-grip` | image | Bottom-right drag handle | 16×16 | Size: `resize-grip` |
 
 ### Sky and weather
@@ -60,6 +61,7 @@ these proportions always hold.
 | `sky-snow` | texture | Sky for snow | 340×356 | Colour: `--color-sky-snow` |
 | `sun` | image | The sun | square | Size: `sun` |
 | `cloud` | image | The cloud (alone, or next to the sun) | wide | Size: `cloud` |
+| `backdrop-cloud` | image | Drifting background clouds in cloudy weather | wide | Sizes, heights, speeds and faintness per layer: `BACKDROP_CLOUDS` in `src/lib/backdrop.js`. Randomly mirrored. |
 | `cloud-bolt` | image | Bolt hanging under the cloud during thunder | tall | Size: `cloud-bolt` |
 | `cloud-snowflake` | image | Snowflake under the cloud during snow (slowly turns) | square | Size: `cloud-snowflake` |
 | `lightning` | image | Big background strikes during thunder | tall | Size: `lightning`. Randomly mirrored. |
@@ -148,6 +150,7 @@ e.g. `[data-slot="leaf"] { filter: saturate(1.2); }`.
 | Which weather uses which sky, bodies, rain/snow, lightning and wind | `SCENES` in [`src/lib/weather.js`](../src/lib/weather.js) |
 | How hard leaves and the vine sway in each wind | `WIND` in [`src/lib/weather.js`](../src/lib/weather.js) |
 | Rain and snow amount, speed, drift and spawn height | `PRECIPITATION` in [`src/lib/precipitation.js`](../src/lib/precipitation.js) |
+| Background cloud layers (how many, size, height, speed, faintness) | `BACKDROP_CLOUDS` in [`src/lib/backdrop.js`](../src/lib/backdrop.js). Turn them on for other weather with `backdrop: 'clouds'` in `SCENES`. |
 | Lightning timing and flash length | `LIGHTNING` in [`src/lib/lightning.js`](../src/lib/lightning.js) |
 | Vine position, width and leaf spacing | `VINE_LAYOUT` in [`src/lib/vine.js`](../src/lib/vine.js) |
 | Stem thickness, curviness, twist frequency and size | `STEM` in [`src/lib/stem.js`](../src/lib/stem.js) |

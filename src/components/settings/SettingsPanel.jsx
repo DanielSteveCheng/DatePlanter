@@ -5,7 +5,7 @@ import { Section } from '../ui/Section';
 import { LocationPicker } from './LocationPicker';
 import { StorageSettings } from './StorageSettings';
 
-export function SettingsPanel({ settings, onSave, onClose, onOpenStats, onOpenMap }) {
+export function SettingsPanel({ settings, identity, onSave, onClose, onOpenStats, onOpenMap }) {
   const [draft, setDraft] = useState(settings);
   const set = (patch) => setDraft((current) => ({ ...current, ...patch }));
 
@@ -31,9 +31,17 @@ export function SettingsPanel({ settings, onSave, onClose, onOpenStats, onOpenMa
     >
       <div className="flex flex-col gap-3">
         <Section title="You">
-          <Field label="Your name">
+          <Field label="Your name (shared with both computers)">
             <TextInput value={draft.author} onChange={(e) => set({ author: e.target.value })} />
           </Field>
+          <div className="flex items-center justify-between gap-2 text-label text-card-text/80">
+            <span>
+              {identity.partner ? `Sharing with ${identity.partner.name}` : 'Waiting for your partner to set up their plant'}
+            </span>
+            <Button variant="ghost" className="px-2 py-0.5" onClick={identity.leave}>
+              Switch person
+            </Button>
+          </div>
         </Section>
         <Section title="Weather">
           <LocationPicker location={draft.location} onChange={(location) => set({ location })} />

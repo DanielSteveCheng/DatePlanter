@@ -16,6 +16,8 @@ contextBridge.exposeInMainWorld('dateplanter', {
     deleteDate: invoke('garden:deleteDate'),
     saveNotes: invoke('garden:saveNotes'),
     upsertMessage: invoke('garden:upsertMessage'),
+    deleteMessage: invoke('garden:deleteMessage'),
+    upsertPerson: invoke('garden:upsertPerson'),
     onChange: (callback) => listen('garden:changed', callback),
     onError: (callback) => listen('garden:error', callback),
   },

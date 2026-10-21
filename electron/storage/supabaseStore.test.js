@@ -6,21 +6,21 @@ function fakeResponse(body, { ok = true, status = 200 } = {}) {
 }
 
 function fakeSupabase() {
-  const db = { dates: [], notes: '', messages: [] };
+  const db = { dates: [], messages: [], shared: new Map() };
   const fetchImpl = vi.fn(async (url, init) => {
     const { pathname, searchParams } = new URL(url);
     const table = pathname.split('/').pop();
     if (init.method === 'GET') {
-      if (table === 'messages') return fakeResponse(db.messages.map((data) => ({ data })));
-      return fakeResponse(table === 'dates' ? db.dates.map((data) => ({ data })) : db.notes ? [{ value: db.notes }] : []);
+      if (table === 'shared') return fakeResponse([...db.shared].map(([key, value]) => ({ key, value })));
+      return fakeResponse(db[table].map((data) => ({ data })));
     }
     if (init.method === 'DELETE') {
       const id = searchParams.get('id').replace('eq.', '');
-      db.dates = db.dates.filter((d) => d.id !== id);
+      db[table] = db[table].filter((d) => d.id !== id);
       return fakeResponse(undefined, { status: 204 });
     }
     const row = JSON.parse(init.body);
-    if (table === 'shared') db.notes = row.value;
+    if (table === 'shared') db.shared.set(row.key, row.value);
     else db[table] = [...db[table].filter((d) => d.id !== row.id), row.data];
     return fakeResponse(undefined, { status: 201 });
   });
@@ -34,8 +34,9 @@ describe('supabaseStore', () => {
 
     await store.upsertDate({ id: 'a', title: 'Picnic' });
     const garden = await store.saveNotes('bring snacks');
-    expect(garden).toEqual({ dates: [{ id: 'a', title: 'Picnic' }], notes: 'bring snacks', messages: [] });
+    expect(garden).toEqual({ dates: [{ id: 'a', title: 'Picnic' }], notes: 'bring snacks', messages: [], people: [] });
     expect((await store.upsertMessage({ id: 'm', text: 'hi' })).messages).toEqual([{ id: 'm', text: 'hi' }]);
+    expect((await store.deleteMessage('m')).messages).toEqual([]);
     expect((await store.deleteDate('a')).dates).toEqual([]);
 
     const [url, init] = fetchImpl.mock.calls[0];
@@ -49,6 +50,18 @@ describe('supabaseStore', () => {
     const store = createSupabaseStore({ url: 'https://x.supabase.co', key: 'sb_publishable_abc' }, { fetchImpl });
     await store.load();
     expect(fetchImpl.mock.calls[0][1].headers).toEqual({ apikey: 'sb_publishable_abc', 'Content-Type': 'application/json' });
+    store.dispose();
+  });
+
+  it('stores each person as their own row in the shared table, next to the notes', async () => {
+    const { db, fetchImpl } = fakeSupabase();
+    const store = createSupabaseStore({ url: 'https://x.supabase.co', key: 'k' }, { fetchImpl });
+    await store.saveNotes('ideas');
+    await store.upsertPerson({ id: 'p1', name: 'Dan' });
+    const garden = await store.upsertPerson({ id: 'p2', name: 'Sam' });
+    expect(garden.people).toEqual([{ id: 'p1', name: 'Dan' }, { id: 'p2', name: 'Sam' }]);
+    expect(garden.notes).toBe('ideas');
+    expect([...db.shared.keys()]).toEqual(['notes', 'person:p1', 'person:p2']);
     store.dispose();
   });
 

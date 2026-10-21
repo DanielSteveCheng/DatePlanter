@@ -1,6 +1,7 @@
 const { normalizeGarden, createEmitter } = require('./garden.cjs');
 
 const NOTES_KEY = 'notes';
+const PERSON_KEY_PREFIX = 'person:';
 
 const isLegacyJwtKey = (key) => key.split('.').length === 3;
 
@@ -21,6 +22,14 @@ function supabaseError(status, body) {
   }
   return new Error(`Supabase ${status}: ${details?.message ?? body}`);
 }
+
+const parseJson = (text) => {
+  try {
+    return JSON.parse(text);
+  } catch {
+    return null;
+  }
+};
 
 function createSupabaseStore({ url, key }, { fetchImpl = fetch, pollMs = 10000 } = {}) {
   const baseUrl = `${url.replace(/\/+$/, '')}/rest/v1`;
@@ -44,15 +53,16 @@ function createSupabaseStore({ url, key }, { fetchImpl = fetch, pollMs = 10000 }
   const upsertRecord = (table, record) => upsert(table, { id: record.id, data: record, updated_at: new Date().toISOString() });
 
   async function load() {
-    const [dateRows, noteRows, messageRows] = await Promise.all([
+    const [dateRows, sharedRows, messageRows] = await Promise.all([
       request('/dates?select=data'),
-      request(`/shared?select=value&key=eq.${NOTES_KEY}`),
+      request('/shared?select=key,value'),
       request('/messages?select=data').catch(() => []),
     ]);
     const garden = normalizeGarden({
       dates: dateRows.map((row) => row.data),
-      notes: noteRows[0]?.value ?? '',
+      notes: sharedRows.find((row) => row.key === NOTES_KEY)?.value ?? '',
       messages: messageRows.map((row) => row.data),
+      people: sharedRows.filter((row) => row.key.startsWith(PERSON_KEY_PREFIX)).map((row) => parseJson(row.value)),
     });
     emitter.remember(garden);
     return garden;
@@ -72,6 +82,9 @@ function createSupabaseStore({ url, key }, { fetchImpl = fetch, pollMs = 10000 }
     deleteDate: (id) => mutateThenLoad(() => request(`/dates?id=eq.${encodeURIComponent(id)}`, { method: 'DELETE' })),
     saveNotes: (notes) => mutateThenLoad(() => upsert('shared', { key: NOTES_KEY, value: notes })),
     upsertMessage: (message) => mutateThenLoad(() => upsertRecord('messages', message)),
+    deleteMessage: (id) => mutateThenLoad(() => request(`/messages?id=eq.${encodeURIComponent(id)}`, { method: 'DELETE' })),
+    upsertPerson: (person) =>
+      mutateThenLoad(() => upsert('shared', { key: `${PERSON_KEY_PREFIX}${person.id}`, value: JSON.stringify(person) })),
     subscribe: emitter.subscribe,
     dispose: () => clearInterval(timer),
   };

@@ -17,7 +17,7 @@ describe('fileStore', () => {
 
   it('starts empty when the file does not exist', async () => {
     const store = createFileStore(filePath, { watch: false });
-    expect(await store.load()).toEqual({ dates: [], notes: '', messages: [] });
+    expect(await store.load()).toEqual({ dates: [], notes: '', messages: [], people: [] });
   });
 
   it('persists dates and notes to disk', async () => {
@@ -36,6 +36,13 @@ describe('fileStore', () => {
     await store.upsertMessage({ id: 'm', text: 'hi', readAt: null });
     const garden = await store.upsertMessage({ id: 'm', text: 'hi', readAt: '2026-09-25T00:00:00Z' });
     expect(garden.messages).toEqual([{ id: 'm', text: 'hi', readAt: '2026-09-25T00:00:00Z' }]);
+    expect((await store.deleteMessage('m')).messages).toEqual([]);
+  });
+
+  it('stores people', async () => {
+    const store = createFileStore(filePath, { watch: false });
+    await store.upsertPerson({ id: 'p1', name: 'Dan' });
+    expect((await store.upsertPerson({ id: 'p1', name: 'Daniel' })).people).toEqual([{ id: 'p1', name: 'Daniel' }]);
   });
 
   it('merges with changes another computer wrote to the file', async () => {

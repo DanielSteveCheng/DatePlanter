@@ -40,6 +40,8 @@ function registerIpc({ win, settings, resizer, miniMode, onTop, defaultDataPath 
     'garden:deleteDate': (id) => store.deleteDate(id),
     'garden:saveNotes': (notes) => store.saveNotes(notes),
     'garden:upsertMessage': (message) => store.upsertMessage(message),
+    'garden:deleteMessage': (id) => store.deleteMessage(id),
+    'garden:upsertPerson': (person) => store.upsertPerson(person),
     'settings:get': () => settings.get(),
     'settings:update': updateSettings,
     'settings:chooseFolder': chooseFolder,

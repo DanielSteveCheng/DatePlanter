@@ -60,5 +60,5 @@ const DEV_NOTES = [
 
 export const DEV_SENDER = Object.freeze({ deviceId: 'dev', name: 'Developer mode' });
 
-export const createDevMessage = (number, { now = new Date() } = {}) =>
-  createMessage(DEV_NOTES[(number - 1) % DEV_NOTES.length], { from: DEV_SENDER, now, id: `${DEV_ID_PREFIX}note-${number}` });
+export const createDevMessage = (number, { to = null, now = new Date() } = {}) =>
+  createMessage(DEV_NOTES[(number - 1) % DEV_NOTES.length], { from: DEV_SENDER, to, now, id: `${DEV_ID_PREFIX}note-${number}` });

@@ -5,7 +5,7 @@ import { readableError } from '../lib/errors';
 
 export function useGarden() {
   const bridge = useBridge();
-  const [garden, setGarden] = useState({ dates: [], notes: '', messages: [] });
+  const [garden, setGarden] = useState({ dates: [], notes: '', messages: [], people: [] });
   const [error, setError] = useState(null);
   const [loaded, setLoaded] = useState(false);
 
@@ -48,6 +48,7 @@ export function useGarden() {
     dates,
     notes: garden.notes,
     messages: garden.messages ?? [],
+    people: garden.people ?? [],
     error,
     dismissError: () => setError(null),
     loaded,
@@ -55,5 +56,7 @@ export function useGarden() {
     deleteDate: (id) => run(() => bridge.garden.deleteDate(id)),
     saveNotes: (notes) => run(() => bridge.garden.saveNotes(notes)),
     saveMessage: (message) => run(() => bridge.garden.upsertMessage(message)),
+    deleteMessage: (id) => run(() => bridge.garden.deleteMessage(id)),
+    savePerson: (person) => run(() => bridge.garden.upsertPerson(person)),
   };
 }

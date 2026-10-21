@@ -13,16 +13,9 @@ function Chip({ active, onClick, children }) {
   );
 }
 
-export function DevToolbar({
-  weatherPreview,
-  onPreview,
-  showSlots,
-  onToggleSlots,
-  leafCount,
-  onAddLeaves,
-  onClearLeaves,
-  onAddMessage,
-}) {
+const count = (n, one, many) => `${n} ${n === 1 ? one : many}`;
+
+export function DevToolbar({ dev, weatherPreview }) {
   return (
     <div
       data-slot="dev-toolbar"
@@ -30,18 +23,19 @@ export function DevToolbar({
     >
       <span className="px-1 font-bold">DEV</span>
       {['live', ...CONDITIONS].map((condition) => (
-        <Chip key={condition} active={weatherPreview === condition} onClick={() => onPreview(condition)}>
+        <Chip key={condition} active={weatherPreview === condition} onClick={() => dev.preview(condition)}>
           {condition}
         </Chip>
       ))}
-      <Chip active={showSlots} onClick={onToggleSlots}>
+      <Chip active={dev.showSlots} onClick={dev.toggleSlots}>
         slots
       </Chip>
       <span className="mx-0.5 h-3 w-px bg-white/30" />
-      <Chip onClick={() => onAddLeaves(1)}>+1 leaf</Chip>
-      <Chip onClick={() => onAddLeaves(5)}>+5</Chip>
-      {leafCount > 0 && <Chip onClick={onClearLeaves}>clear {leafCount}</Chip>}
-      <Chip onClick={onAddMessage}>+message</Chip>
+      <Chip onClick={() => dev.addDates(1)}>+1 leaf</Chip>
+      <Chip onClick={() => dev.addDates(5)}>+5</Chip>
+      {dev.dates.length > 0 && <Chip onClick={dev.clearDates}>clear {count(dev.dates.length, 'leaf', 'leaves')}</Chip>}
+      <Chip onClick={dev.addMessage}>+message</Chip>
+      {dev.messages.length > 0 && <Chip onClick={dev.clearMessages}>clear {count(dev.messages.length, 'message', 'messages')}</Chip>}
     </div>
   );
 }

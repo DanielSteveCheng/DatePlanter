@@ -9,6 +9,7 @@ import { SettingsPanel } from './components/settings/SettingsPanel';
 import { StatsPanel } from './components/stats/StatsPanel';
 import { MapPanel } from './components/map/MapPanel';
 import { ComposePanel } from './components/messages/ComposePanel';
+import { WhoAreYouPanel } from './components/identity/WhoAreYouPanel';
 import { DevToolbar } from './components/dev/DevToolbar';
 import { IconButton } from './components/ui/IconButton';
 import { usePlantedDates } from './hooks/usePlantedDates';
@@ -18,7 +19,7 @@ import { activeCondition, sceneFor } from './lib/weather';
 
 const today = () => new Date().toLocaleDateString(undefined, { weekday: 'long' });
 
-export function GardenApp({ settings, updateSettings, garden, weather, dev, inbox, onMinimize }) {
+export function GardenApp({ settings, updateSettings, garden, weather, dev, identity, inbox, onMinimize }) {
   const [selection, dispatch] = useReducer(selectionReducer, CLOSED);
   const [overlay, setOverlay] = useState(null);
   const planted = usePlantedDates(garden, dev);
@@ -42,8 +43,19 @@ export function GardenApp({ settings, updateSettings, garden, weather, dev, inbo
   }
 
   async function saveSettings(next) {
-    await updateSettings(next);
+    const name = next.author.trim();
+    const personChanges = {
+      ...(name && name !== settings.author ? { name } : {}),
+      ...(next.location !== settings.location ? { location: next.location } : {}),
+    };
+    if (Object.keys(personChanges).length > 0) await identity.update(personChanges);
+    await updateSettings({ ...next, author: name || settings.author });
     closeOverlay();
+  }
+
+  function switchPerson() {
+    closeOverlay();
+    identity.leave();
   }
 
   return (
@@ -54,19 +66,10 @@ export function GardenApp({ settings, updateSettings, garden, weather, dev, inbo
       onOpenMessages={() => setOverlay('compose')}
     >
       {dev.enabled && (
-        <DevToolbar
-          weatherPreview={settings.weatherPreview}
-          onPreview={dev.preview}
-          showSlots={dev.showSlots}
-          onToggleSlots={dev.toggleSlots}
-          leafCount={dev.dates.length}
-          onAddLeaves={dev.addDates}
-          onClearLeaves={dev.clearDates}
-          onAddMessage={dev.addMessage}
-        />
+        <DevToolbar dev={dev} weatherPreview={settings.weatherPreview} />
       )}
       <Sky scene={sceneFor(condition)}>
-        <WeatherReadout weather={weather} units={settings.units} dayName={today()} />
+        <WeatherReadout weather={weather} units={settings.units} dayName={today()} onSetLocation={() => setOverlay('settings')} />
         <Vine
           dates={planted.dates}
           selectedId={selection.dateId}
@@ -92,13 +95,20 @@ export function GardenApp({ settings, updateSettings, garden, weather, dev, inbo
       </Sky>
       <Soil notes={garden.notes} onNotesChange={(notes) => garden.saveNotes(notes).catch(() => {})} onAddDate={() => dispatch({ type: 'plant' })} />
       {overlay === 'settings' && (
-        <SettingsPanel settings={settings} onSave={saveSettings} onClose={closeOverlay} onOpenStats={() => setOverlay('stats')}
+        <SettingsPanel settings={settings} identity={{ ...identity, leave: switchPerson }} onSave={saveSettings} onClose={closeOverlay} onOpenStats={() => setOverlay('stats')}
           onOpenMap={() => setOverlay('map')}
         />
       )}
       {overlay === 'stats' && <StatsPanel dates={planted.dates} onBack={() => setOverlay('settings')} onClose={closeOverlay} />}
       {overlay === 'compose' && (
-        <ComposePanel sent={inbox.sent} hasName={Boolean(settings.author?.trim())} onSend={inbox.send} onClose={closeOverlay} />
+        <ComposePanel
+          conversation={inbox.conversation}
+          me={inbox.me}
+          recipient={inbox.recipient}
+          onSend={inbox.send}
+          onDelete={inbox.remove}
+          onClose={closeOverlay}
+        />
       )}
       {overlay === 'map' && (
         <MapPanel
@@ -112,6 +122,7 @@ export function GardenApp({ settings, updateSettings, garden, weather, dev, inbo
           onClose={closeOverlay}
         />
       )}
+      {identity.needsSetup && <WhoAreYouPanel identity={identity} suggestedName={settings.author} />}
     </AppFrame>
   );
 }

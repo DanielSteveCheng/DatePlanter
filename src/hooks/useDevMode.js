@@ -10,7 +10,7 @@ export function useDevMode(settings, updateSettings) {
   const [showSlots, setShowSlots] = useState(false);
   const dates = useLocalRecords((count, startNumber) => createDevDates(count, { startNumber, center: settings?.location }));
   const messages = useLocalRecords((count, startNumber) =>
-    Array.from({ length: count }, (_, i) => createDevMessage(startNumber + i)),
+    Array.from({ length: count }, (_, i) => createDevMessage(startNumber + i, { to: settings?.personId || null })),
   );
   const enabled = Boolean(settings?.devMode);
 
@@ -29,5 +29,7 @@ export function useDevMode(settings, updateSettings) {
     messages: enabled ? messages.records : NONE,
     addMessage: () => messages.add(1),
     saveMessage: messages.save,
+    deleteMessage: messages.remove,
+    clearMessages: messages.clear,
   };
 }

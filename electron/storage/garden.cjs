@@ -1,4 +1,4 @@
-const emptyGarden = () => ({ dates: [], notes: '', messages: [] });
+const emptyGarden = () => ({ dates: [], notes: '', messages: [], people: [] });
 
 const withIds = (list) => (Array.isArray(list) ? list.filter((item) => item && typeof item.id === 'string') : []);
 
@@ -7,6 +7,7 @@ function normalizeGarden(raw) {
     dates: withIds(raw?.dates),
     notes: typeof raw?.notes === 'string' ? raw.notes : '',
     messages: withIds(raw?.messages),
+    people: withIds(raw?.people),
   };
 }
 

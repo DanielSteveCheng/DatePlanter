@@ -8,7 +8,8 @@ A little desktop plant that grows a leaf for every date you plan together.
   no key needed). Pick one to pin the date on the map, or keep whatever you typed.
 - **Messages:** the ✉ button sends a message that blooms as a little bud on the other person's plant.
   Clicking the bud opens it; **Reply** answers right there (showing what you're replying to), and
-  closing it marks it read. The ✉ panel lists what you've sent and whether it's been read.
+  closing it marks it read. The ✉ panel shows your recent messages in both directions (with read
+  status) and lets you delete any of them for both of you.
 - **Notes:** the box in the soil is a shared scratchpad for ideas.
 - **Weather:** the sky follows today's weather (sunny, partly cloudy, cloudy, rain, thunder, snow).
 - **Stats and map:** ⚙ → **Stats** (favourite types, places, days…) and ⚙ → **Map** (every pinned date).
@@ -16,7 +17,11 @@ A little desktop plant that grows a leaf for every date you plan together.
   the app back. Messages appear on the pot too.
 - **Resizing:** drag the bottom-right grip. The window keeps its shape and everything scales with it.
 
-Open ⚙ to set your name, weather location, °F/°C, keep-on-top, and how you share the garden.
+The first time each computer opens the garden, it asks **who it belongs to**. A garden is for two
+people (say, Daniel and Rachel); each can use several computers. Messages go to the other *person*,
+so they show up on all of their computers and never on your own.
+
+Open ⚙ to change your name, weather location, °F/°C, keep-on-top, and how you share the garden.
 
 ## Getting started
 
@@ -103,11 +108,13 @@ in [`docs/CUSTOMIZING.md`](docs/CUSTOMIZING.md).
 ## Developer tools
 
 - **Developer mode** (Ctrl+Shift+D, or ⚙ → Developer) adds a toolbar to force any weather, outline
-  every sprite slot, and add temporary leaves and messages. These are never saved or shared.
+  every sprite slot, and add or clear temporary leaves and messages. These are never saved or shared.
 - **Partner window** (to test sharing and messages on one computer): with `npm run dev` running, run
   `npm run partner` in a second terminal. It opens another window with its own profile in
-  `.profiles/partner`, set up with your sharing settings, so it behaves like the other person's
-  computer. Delete that folder to start the partner fresh.
+  `.profiles/partner`, set up with your sharing settings, so it behaves like another computer. It
+  shares your real garden, so when it asks who it belongs to, choose the other person (e.g. create
+  "Rachel" if she hasn't set up yet; she can pick "Rachel" on her own Mac later). Delete that folder
+  to start the partner fresh.
 
 ## How it's built
 

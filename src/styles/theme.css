@@ -78,6 +78,7 @@
   --animate-strike: strike 0.6s ease-out forwards;
   --animate-sprout: sprout 0.5s ease-out both;
   --animate-drift: drift 40s linear infinite;
+  --animate-cross-sky: cross-sky 60s linear infinite;
   --animate-twirl: twirl 12s linear infinite;
   --animate-shrink: shrink 320ms cubic-bezier(0.5, 0, 0.9, 0.4) both;
   --animate-grow: grow 480ms cubic-bezier(0.2, 0.9, 0.3, 1.15) both;
@@ -129,6 +130,10 @@
   }
   @keyframes twirl {
     to { rotate: 360deg; }
+  }
+  @keyframes cross-sky {
+    from { translate: -100% 0; }
+    to { translate: 100cqw 0; }
   }
   @keyframes drift {
     0%, 100% { translate: 0 0; }

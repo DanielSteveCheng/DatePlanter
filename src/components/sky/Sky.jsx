@@ -1,6 +1,7 @@
 import { Surface } from '../../sprites/Surface';
 import { cn } from '../../lib/cn';
 import { windFor, windStyle } from '../../lib/weather';
+import { BackdropClouds } from './BackdropClouds';
 import { CelestialBodies } from './CelestialBodies';
 import { Precipitation } from './Precipitation';
 import { LightningStrikes } from './LightningStrikes';
@@ -18,6 +19,7 @@ export function Sky({ scene, children }) {
       className={cn('relative min-h-0 flex-1 overflow-hidden rounded-t-2xl transition-colors duration-700', SKY_CLASSES[scene.sky])}
       style={windStyle(windFor(scene))}
     >
+      {scene.backdrop === 'clouds' && <BackdropClouds />}
       {scene.lightning && <LightningStrikes />}
       {scene.precipitation && <Precipitation slot={scene.precipitation} />}
       <CelestialBodies bodies={scene.bodies} />

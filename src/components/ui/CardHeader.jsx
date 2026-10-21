@@ -19,7 +19,7 @@ export function CardHeader({ title, subtitle, tone, actions, closeLabel, onClose
       </div>
       <div className="-mt-0.5 flex items-center gap-1">
         {actions}
-        <IconButton icon="icon-close" label={closeLabel} onClick={onClose} className="hover:bg-white/10" />
+        {onClose && <IconButton icon="icon-close" label={closeLabel} onClick={onClose} className="hover:bg-white/10" />}
       </div>
     </div>
   );

@@ -7,6 +7,9 @@ export function ReplyForm({ to, onSend, onCancel }) {
 
   return (
     <div className="mt-2 flex flex-col gap-1.5">
+      <p data-slot="message-recipient" className="text-label font-semibold opacity-70">
+        To {to}
+      </p>
       <TextArea
         tone="bubble"
         autoFocus

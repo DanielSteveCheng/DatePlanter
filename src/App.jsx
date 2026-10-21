@@ -3,6 +3,7 @@ import { WindowShell } from './components/frame/WindowShell';
 import { GardenApp } from './GardenApp';
 import { useDevMode } from './hooks/useDevMode';
 import { useGarden } from './hooks/useGarden';
+import { useIdentity } from './hooks/useIdentity';
 import { useInbox } from './hooks/useInbox';
 import { useMiniMode } from './hooks/useMiniMode';
 import { useSettings } from './hooks/useSettings';
@@ -15,7 +16,8 @@ export default function App() {
   const weather = useWeather(settings?.location, settings?.units);
   const mini = useMiniMode();
   const dev = useDevMode(settings, updateSettings);
-  const inbox = useInbox({ garden, dev, settings });
+  const identity = useIdentity({ garden, settings, updateSettings });
+  const inbox = useInbox({ garden, dev, identity, settings });
   const ready = useStartup({
     settingsLoaded: Boolean(settings),
     gardenLoaded: garden.loaded,
@@ -42,6 +44,7 @@ export default function App() {
           garden={garden}
           weather={weather}
           dev={dev}
+          identity={identity}
           inbox={inbox}
           onMinimize={mini.collapse}
         />

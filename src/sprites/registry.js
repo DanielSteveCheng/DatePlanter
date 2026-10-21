@@ -3,6 +3,7 @@ import * as Defaults from './defaults';
 export const IMAGE_SLOTS = {
   sun: Defaults.Sun,
   cloud: Defaults.Cloud,
+  'backdrop-cloud': Defaults.Cloud,
   raindrop: Defaults.Raindrop,
   snowflake: Defaults.Snowflake,
   lightning: Defaults.Lightning,
@@ -18,6 +19,7 @@ export const IMAGE_SLOTS = {
   'icon-settings': Defaults.IconSettings,
   'icon-minimize': Defaults.IconMinimize,
   'icon-close': Defaults.IconClose,
+  'icon-delete': Defaults.IconDelete,
   'resize-grip': Defaults.ResizeGrip,
 };
 
