@@ -122,7 +122,7 @@ export function GardenApp({ settings, updateSettings, garden, weather, dev, iden
           onClose={closeOverlay}
         />
       )}
-      {identity.needsSetup && <WhoAreYouPanel identity={identity} suggestedName={settings.author} />}
+      {identity.needsSetup && !overlay && <WhoAreYouPanel identity={identity} suggestedName={settings.author} />}
     </AppFrame>
   );
 }

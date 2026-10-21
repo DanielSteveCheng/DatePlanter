@@ -1,5 +1,6 @@
 import { useBridge } from '../../api/BridgeContext';
 import { Button, Field, Select, TextInput } from '../ui/controls';
+import { CopyInviteButton, PasteInvite } from './InviteCode';
 
 export function StorageSettings({ storage, onChange }) {
   const bridge = useBridge();
@@ -32,8 +33,10 @@ export function StorageSettings({ storage, onChange }) {
           <Field label="Publishable (anon) key">
             <TextInput type="password" value={storage.supabaseKey} onChange={(e) => onChange({ supabaseKey: e.target.value })} />
           </Field>
+          <CopyInviteButton storage={storage} />
         </>
       )}
+      <PasteInvite label="Or paste an invite code" onJoin={async (invite) => onChange(invite)} />
     </>
   );
 }

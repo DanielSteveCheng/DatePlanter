@@ -88,9 +88,15 @@ the other person's changes sync in.
 
 **Supabase (free hosted database).** Create a project at supabase.com, run
 [`docs/supabase.sql`](docs/supabase.sql) in its SQL editor, then paste the project URL and the
-publishable key (Project Settings → API Keys; the legacy `anon` key also works) into ⚙ on both
-computers. Changes show up on the other computer within about 10 seconds. The script is safe to run
-again, so re-run it after updates that add tables (messages need the `messages` table).
+publishable key (Project Settings → API Keys; the legacy `anon` key also works) into ⚙ → Sharing on
+the first computer. Changes show up on the other computer within about 10 seconds. The script is safe
+to run again, so re-run it after updates that add tables (messages need the `messages` table).
+
+**Invite codes (no copying keys around).** On a computer that's already connected, open ⚙ → Sharing
+and click **Copy invite code**, then send the code to the other person (text, email…). On a new
+computer, paste it into **"Joining your partner's garden?"** on the first-run screen, or into ⚙ →
+Sharing → **Or paste an invite code** (then Save). The code holds the project URL and key, so treat
+it like the key itself and only share it with each other.
 
 ## Customizing the look
 
