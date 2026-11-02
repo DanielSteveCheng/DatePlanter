@@ -7,7 +7,7 @@ export function DatePanel({ selection, date, near, onSubmit, onEdit, onDelete, o
   if (selection.mode === 'new') {
     return (
       <DateCard key="new" heading="New date" onClose={onClose}>
-        <DateForm initialFields={emptyDateFields()} allowPast={false} near={near} onSubmit={onSubmit} onCancel={onClose} />
+        <DateForm initialFields={emptyDateFields()} allowPast={true} near={near} onSubmit={onSubmit} onCancel={onClose} />
       </DateCard>
     );
   }
